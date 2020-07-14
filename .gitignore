@@ -1,0 +1,9 @@
+*.fig
+*.txt
+__pycache__
+*.tex
+*.pdf
+*.eps
+*.html
+*.js
+*.png
