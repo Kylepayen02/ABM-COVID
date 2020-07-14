@@ -18,7 +18,7 @@ void Agent::print_basic(std::ostream& where) const
 		  << " " << age << " " << x << " " << y << " "
 		  << house_ID << " " << is_non_covid_patient << " " << school_ID 
 		  << " " << work_ID << " " << works_at_hospital 
-		  << " " << hospital_ID << " " << is_infected;	
+		  << " " << " " << is_infected;
 }
 
 //

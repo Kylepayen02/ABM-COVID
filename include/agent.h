@@ -43,11 +43,10 @@ public:
  	 */	
 	Agent(const bool student, const bool works, const int yrs, const double xi, 
 			const double yi, const int houseID, const bool isPatient, const int schoolID, 
-			const int workID, const bool worksHospital, const int hospitalID, const bool infected) 
+			const int workID, const bool worksHospital, const bool infected, bool fuck)
 			: is_student(student), is_working(works), age(yrs),
 		   		x(xi), y(yi), house_ID(houseID), is_non_covid_patient(isPatient), school_ID(schoolID), 
-				work_ID(workID), works_at_hospital(worksHospital), hospital_ID(hospitalID),
-				is_infected(infected) { }  
+				work_ID(workID), works_at_hospital(worksHospital), is_infected(infected) { }
 
 	//
 	// Infection related computations
@@ -67,9 +66,6 @@ public:
 	int get_school_ID() const { return school_ID; }
 	/// Work ID
 	int get_work_ID() const { return work_ID; }
-	/// Hospital ID if staff or patient
-	int get_hospital_ID() const { return hospital_ID; }
-
 	/// Location - x coordinates
 	double get_x_location() const { return x; }	
 	/// Location - y coordinates
@@ -91,23 +87,8 @@ public:
 	bool recovering_exposed() const { return is_recovering_exposed; }
 	bool symptomatic() const { return is_symptomatic; }
 	bool symptomatic_non_covid() const { return is_symptomatic_non_covid;}
-	// Testing results
-	bool tested_covid_negative() const { return is_tested_covid_negative; }
-	bool tested_false_negative() const { return is_tested_false_negative; }
-	bool tested_false_positive() const { return is_tested_false_positive; }
-	bool tested_covid_positive() const { return is_tested_covid_positive; }
-	// Testing phases and types 
-	bool tested() const { return is_tested; }
-	bool tested_exposed() const { return is_tested_exposed; }
-	bool tested_in_car() const { return is_tested_in_car; }
-	bool tested_in_hospital() const { return is_tested_in_hospital; }
-	bool tested_awaiting_results() const { return is_tested_awaiting_results; }
-	bool tested_awaiting_test() const { return is_tested_awaiting_test; } 
-	// Treatment types
-	bool being_treated() const { return is_treated; }
-	bool home_isolated() const { return is_home_isolated; }
-	bool hospitalized() const { return is_hospitalized; }
-	bool hospitalized_ICU() const { return is_hospitalized_ICU; }
+    bool home_isolated() const { return is_home_isolated; }
+
 	// Removal
 	bool dying() const { return will_die; }
 	bool recovering() const { return will_recover; }
@@ -122,31 +103,14 @@ public:
 	/// Get time of death if not recovering
 	double get_time_of_death() const { return death_time; }
 	/// Get time of recovery
-	double get_recovery_time() const { return recovery_time; } 
-	/// Time of testing
-	double get_time_of_test() const { return time_of_test; }
-	/// Time when agent gets their testing results
-	double get_time_of_results() const { return time_of_results; }
-	/// Time when dying agent is transferred from hospital to ICU
-	double get_time_hsp_to_icu() const { return time_hsp_to_ICU; }
-	/// Time when agent is transferred from ICU to hospital
-	double get_time_icu_to_hsp() const { return time_icu_to_hsp; }
-	/// Time when recovering agent is transferred from hospital to home isolation
-	double get_time_hsp_to_ih() const { return time_hsp_to_ih; }
-	/// Time when dying agent is transferred from home isolation to ICU
-	double get_time_ih_to_icu() const { return time_ih_to_icu; }
-	/// Time when recovering agent is transferred from home isolation to hospital
-	double get_time_ih_to_hsp() const { return time_ih_to_hsp; }
+	double get_recovery_time() const { return recovery_time; }
 
 	//
 	// Setters
 	//
 
 	/// Assign ID to an agent
-	void set_ID(const int agent_ID) { ID = agent_ID; }	
-
-	/// Assign hospital ID for testing
-	void set_hospital_ID(const int ID) { hospital_ID = ID; }
+	void set_ID(const int agent_ID) { ID = agent_ID; }
 
 	/// Assign household ID
 	void set_household_ID(const int ID) { house_ID = ID; }
@@ -178,49 +142,13 @@ public:
 	void set_recovery_time(const double cur_time) 
 		{ recovery_time = cur_time + recovery_duration; }
 
-	// Testing
-	void set_time_to_test(const double test_time) { time_to_test = test_time; }
-	void set_time_of_test(const double cur_time) { time_of_test = cur_time + time_to_test; }
-
-	// Test results
-	void set_time_until_results(const double test_res_time) { time_until_results = test_res_time; }
-	void set_time_of_results(const double cur_time) { time_of_results = cur_time + time_until_results; }
-
-	/// Transition from hospital to ICU
-	void set_time_hsp_to_icu(const double t_icu) { time_hsp_to_ICU = t_icu; }
-	/// Transition from hospital to home isolation
-	void set_time_hsp_to_ih(const double t_ih) { time_hsp_to_ih = t_ih; }
-	/// Transition from ICU to hospital
-	void set_time_icu_to_hsp(const double t_icu) { time_icu_to_hsp = t_icu; }
-	/// Transition from home isolation to ICU
-	void set_time_ih_to_icu(const double t_icu) { time_ih_to_icu = t_icu; }
-	/// Transition from home isolation to hospital
-	void set_time_ih_to_hsp(const double t_hsp) { time_ih_to_hsp = t_hsp; }
-
 	/// State setters
 	void set_exposed(const bool val) { is_exposed = val; }
 	void set_recovering_exposed(const bool re) { is_recovering_exposed = re; }
 	void set_symptomatic(const bool val) { is_symptomatic = val; }
 	void set_symptomatic_non_covid(const bool val) { is_symptomatic_non_covid = val; }
 
-	// Testing results
-	void set_tested_covid_negative(const bool val) { is_tested_covid_negative = val; }
-	void set_tested_false_negative(const bool val) { is_tested_false_negative = val; }
-	void set_tested_false_positive(const bool val) { is_tested_false_positive = val; }
-	void set_tested_covid_positive(const bool val) { is_tested_covid_positive = val; }
-	// Testing phases and types
-	void set_tested(const bool val) { is_tested = val; }
-	void set_tested_in_car(const bool val) { is_tested_in_car = val; }
-	void set_tested_in_hospital(const bool val) { is_tested_in_hospital = val; }
-	void set_tested_awaiting_results(const bool val) { is_tested_awaiting_results = val; }
-	void set_tested_awaiting_test(const bool val) { is_tested_awaiting_test = val; }
-	void set_tested_exposed(const bool val) { is_tested_exposed = val; }
-
-	// Treatment types
-	void set_being_treated(const bool val) { is_treated = val; }
-	void set_home_isolated(const bool val) { is_home_isolated = val; }
-	void set_hospitalized(const bool val) { is_hospitalized = val; }
-	void set_hospitalized_ICU(const bool val) { is_hospitalized_ICU = val; }
+    void set_home_isolated(const bool val) { is_home_isolated = val; }
 	void set_dying(const bool val) { will_die = val; }
 	void set_recovering(const bool val) { will_recover = val; }
 	void set_removed(const bool val) { is_removed = val; }
@@ -261,24 +189,6 @@ private:
 	double recovery_duration = 0.0;
 	// Time of recovery
 	double recovery_time = 0.0;
-	// Time between testing decision and the test
-	double time_to_test = 0.0;
-	// Exact time of testing
-	double time_of_test = 0.0;
-	// Time from testing until results
-	double time_until_results = 0.0;
-	// Time when results are available
-	double time_of_results = 0.0;
-	// Time when dying agent is transferred from hospital to ICU
-	double time_hsp_to_ICU = 0.0;
-	// Time from hospitalization to home isolation
-	double time_hsp_to_ih = 0.0;
-	// Time from ICU to hospitalization
-	double time_icu_to_hsp = 0.0;
-	// Time from IH to ICU
-	double time_ih_to_icu = 0.0;
-	// Time from IH to hospitalization
-	double time_ih_to_hsp = 0.0;
 
 	// ID
 	int ID = 0;
@@ -294,7 +204,6 @@ private:
 	// School and work IDs and types
 	int school_ID = -1;
 	int work_ID = -1;
-	int hospital_ID = -1;
 	int agent_school_type = -1; 
 	bool works_at_hospital = false;
 
@@ -310,23 +219,9 @@ private:
 	bool is_recovering_exposed = false;
 	bool is_symptomatic = false;
 	bool is_symptomatic_non_covid = false;
-	// Testing results
-	bool is_tested_covid_negative = false;
-	bool is_tested_false_negative = false;
-	bool is_tested_false_positive = false;
-	bool is_tested_covid_positive = false;
+
 	// Testing phases and types
-	bool is_tested = false;
-	bool is_tested_in_car = false;
-	bool is_tested_in_hospital = false;
-	bool is_tested_awaiting_results = false;
-	bool is_tested_awaiting_test = false;
-	bool is_tested_exposed = false;
-	// Treatment types
-	bool is_treated = false;
-	bool is_home_isolated = false;
-	bool is_hospitalized = false;
-	bool is_hospitalized_ICU = false;
+    bool is_home_isolated = false;
 	bool will_die = false;
 	bool will_recover = false;
 	bool is_removed = false;
