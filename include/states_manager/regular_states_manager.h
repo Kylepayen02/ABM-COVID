@@ -48,11 +48,6 @@ public:
 
 private:
 
-	/// Set all testing states to a single value 
-	void set_all_testing_states(Agent& agent, const bool val);
-
-	/// Set all treatment states to a single value 
-	void set_all_treatment_states(Agent& agent, const bool val);
 
 };
 

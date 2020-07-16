@@ -39,7 +39,6 @@ int main()
 	abm.create_households(hfile);
 	abm.create_schools(sfile);
 	abm.create_workplaces(wfile);
-	abm.create_hospitals(hsp_file);
 
 	// Then the agents
 	abm.create_agents(fin);

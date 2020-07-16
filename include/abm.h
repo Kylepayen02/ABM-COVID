@@ -253,8 +253,6 @@ public:
 	std::vector<School> get_copied_vector_of_schools() const { return schools; }
 	/// Return a copy of a Workplace object vector
 	std::vector<Workplace> get_copied_vector_of_workplaces() const { return workplaces; }
-	/// Return a copy of a Hospital object vector
-	std::vector<Hospital> get_copied_vector_of_hospitals() const { return hospitals; }
 	/// Return a copy of Infection object
 	Infection get_copied_infection_object() const { return infection; }
 	/// Return a const reference to parameter map
@@ -265,7 +263,7 @@ private:
 	// General model attributes
 	// Time step
 	double dt = 1.0;
-	// Time - updated contiuously throughout the simulation
+	// Time - updated continuously throughout the simulation
 	double time = 0.0;
 
 	// Total number of infected, dead and recovered
@@ -293,7 +291,7 @@ private:
 	std::vector<Household> households;
 	std::vector<School> schools;
 	std::vector<Workplace> workplaces;
-	std::vector<Hospital> hospitals;
+
 
 	// Private methods
 
