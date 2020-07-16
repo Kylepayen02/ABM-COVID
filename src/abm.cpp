@@ -35,13 +35,8 @@ void ABM::load_infection_parameters(const std::string infile)
 					infection_parameters.at("agent variability gamma scale"));
 	infection.set_onset_to_death_distribution(infection_parameters.at("otd logn mean"), 
 					infection_parameters.at("otd logn std"));
-	infection.set_onset_to_hospitalization_distribution(infection_parameters.at("oth gamma shape"), infection_parameters.at("oth gamma scale"));
-	infection.set_hospitalization_to_death_distribution(infection_parameters.at("htd wbl shape"), infection_parameters.at("htd wbl scale"));
-
 	// Set single-number probabilities
-	infection.set_other_probabilities(infection_parameters.at("fraction exposed never symptomatic"),
-									  infection_parameters.at("fraction to get tested"),
-									  infection_parameters.at("probability of death in ICU"));
+	infection.set_other_probabilities(infection_parameters.at("fraction exposed never symptomatic"));
 }
 
 // Load age-dependent distributions, store in a map of maps
@@ -59,8 +54,6 @@ void ABM::load_age_dependent_distributions(const std::map<std::string, std::stri
 
 	// Send to Infection class for further processing 
 	infection.set_mortality_rates(age_dependent_distributions.at("mortality"));
-	infection.set_hospitalized_fractions(age_dependent_distributions.at("hospitalization"));
-	infection.set_hospitalized_ICU_fractions(age_dependent_distributions.at("ICU"));
 }
 
 // Generate and store household objects
@@ -137,31 +130,6 @@ void ABM::create_workplaces(const std::string fname)
 	}
 }
 
-// Create hospitals based on information in a file
-void ABM::create_hospitals(const std::string fname)
-{
-	// Read the whole file
-	std::vector<std::vector<std::string>> file = read_object(fname);
-	
-	// One hospital per line
-	for (auto& hospital : file){
-		// Make a map of transmission rates for different 
-		// hospital-related categories
-		std::map<const std::string, const double> betas = 
-			{{"hospital employee", infection_parameters.at("healthcare employees transmission rate")}, 
-			 {"hospital non-COVID patient", infection_parameters.at("hospital patients transmission rate")},
-			 {"hospital testee", infection_parameters.at("hospital tested transmission rate")},
-			 {"hospitalized", infection_parameters.at("hospitalized transmission rate")}, 
-			 {"hospitalized ICU", infection_parameters.at("hospitalized ICU transmission rate")}};
-
-		Hospital temp_hospital(std::stoi(hospital.at(0)), 
-			std::stod(hospital.at(1)), std::stod(hospital.at(2)),
-			infection_parameters.at("severity correction"), betas);
-
-		// Store 
-		hospitals.push_back(temp_hospital);
-	}
-}
 
 // Create agents and assign them to appropriate places
 void ABM::create_agents(const std::string fname)
@@ -176,41 +144,26 @@ void ABM::load_agents(const std::string fname)
 	// Read the whole file
 	std::vector<std::vector<std::string>> file = read_object(fname);
 
-	// Flu settings
-	// Set fraction of flu (non-covid symptomatic)
-	flu.set_fraction(infection_parameters.at("fraction with flu"));
-	// Set testing-related probabilities
-	double frac_tested_flu = (infection_parameters.at("fraction false positive") +
-					infection_parameters.at("negative tests fraction"))*infection_parameters.at("fraction to get tested");
-	flu.set_fraction_tested(frac_tested_flu);
-	flu.set_fraction_tested_false_positive(infection_parameters.at("fraction false positive"));
-	
+
 	// Counter for agent IDs
 	int agent_ID = 1;
 	
 	// One agent per line, with properties as defined in the line
 	for (auto agent : file){
 		// Agent status
-		bool student = false, works = false, 
-			 patient = false, hospital_staff = false;
+		bool student = false, works = false;
 		int house_ID = -1;
 
 		// Household ID only if not hospitalized with condition
 		// different than COVID-19
-		if (std::stoi(agent.at(6)) == 1){
-			patient = true;
-			house_ID = 0;
-		}else{
-			house_ID = std::stoi(agent.at(5));
-		}
+
+		house_ID = std::stoi(agent.at(5));
 
 		// No school or work if patient with condition other than COVID
-		if (std::stoi(agent.at(9)) == 1 && !patient)
-			hospital_staff = true;	
-		if (std::stoi(agent.at(0)) == 1 && !patient)
+		if (std::stoi(agent.at(0)) == 1)
 			student = true;
 	   	// No work if a hospital employee	
-		if (std::stoi(agent.at(1)) == 1 && !(patient || hospital_staff))
+		if (std::stoi(agent.at(1)) == 1)
 			works = true; 
 			
 		// Check if infected
@@ -218,17 +171,11 @@ void ABM::load_agents(const std::string fname)
 		if (std::stoi(agent.at(11)) == 1){
 			infected = true;
 			n_infected_tot++;
-		}else{
-			// If not patient or hospital employee
-			// Add to potential flu group
-			if ((hospital_staff == false) && (patient == false))
-				flu.add_susceptible_agent(agent_ID);
 		}
 
 		Agent temp_agent(student, works, std::stoi(agent.at(2)), 
 			std::stod(agent.at(3)), std::stod(agent.at(4)), house_ID,
-			patient, std::stoi(agent.at(7)), std::stoi(agent.at(8)), 
-			hospital_staff, std::stoi(agent.at(10)), infected);
+			std::stoi(agent.at(7)), std::stoi(agent.at(8)), infected);
 
 		// Set Agent ID
 		temp_agent.set_ID(agent_ID++);
@@ -240,18 +187,9 @@ void ABM::load_agents(const std::string fname)
 		// Store
 		agents.push_back(temp_agent);
 	}
-	// Randomly assign portion of susceptible with flu
-	// The set agents flags
-	std::vector<int> flu_IDs = flu.generate_flu();
-	for (const auto& ind : flu_IDs){
-		Agent& agent = agents.at(ind-1);
-		const int n_hospitals = hospitals.size();
-		transitions.process_new_flu(agent, n_hospitals, time,
-					    schools, workplaces, infection, infection_parameters, flu);
-	}
 }
 
-// Assign agents to households, schools, and worplaces
+// Assign agents to households, schools, and workplaces
 void ABM::register_agents()
 {
 	int house_ID = 0, school_ID = 0, work_ID = 0, hospital_ID = 0;
@@ -264,13 +202,6 @@ void ABM::register_agents()
 		agent_ID = agent.get_ID();
 		infected = agent.infected();
 
-		// If not a non-COVID hospital patient, 
-		// register in the household
-		if (agent.hospital_non_covid_patient() == false){
-			house_ID = agent.get_household_ID();
-			Household& house = households.at(house_ID - 1); 
-			house.register_agent(agent_ID, infected);
-		}
 
 		// Register in schools, workplaces, and hospitals 
 		if (agent.student()){
@@ -285,12 +216,6 @@ void ABM::register_agents()
 			work.register_agent(agent_ID, infected);		
 		}
 
-		if (agent.hospital_employee() || 
-				agent.hospital_non_covid_patient()){
-			hospital_ID = agent.get_hospital_ID();
-			Hospital& hospital = hospitals.at(hospital_ID - 1);
-			hospital.register_agent(agent_ID, infected);	
-		}
 	} 
 }
 
@@ -336,7 +261,7 @@ void ABM::transmit_infection()
 	compute_state_transitions();
 	
 	// Reset the place sums
-	contributions.reset_sums(households, schools, workplaces, hospitals);
+	contributions.reset_sums(households, schools, workplaces);
 
 	// Increase the time
 	advance_in_time();	
@@ -355,13 +280,6 @@ void ABM::compute_place_contributions()
 		// If susceptible and being tested - add to hospital's
 		// total number of people present at this time step
 		if (agent.infected() == false){
-			if ((agent.tested() == true) && 
-				(agent.tested_in_hospital() == true) &&
-				(agent.get_time_of_test() <= time) && 
-		 		(agent.tested_awaiting_test() == true)){
-
-				hospitals.at(agent.get_hospital_ID() - 1).increase_total_tested();
-			}			
 			continue;
 		}
 
@@ -369,16 +287,16 @@ void ABM::compute_place_contributions()
 		// exception if no existing case
 		if (agent.exposed() == true){
 			contributions.compute_exposed_contributions(agent, time, households, 
-							schools, workplaces, hospitals);
+							schools, workplaces);
 		}else if (agent.symptomatic() == true){
 			contributions.compute_symptomatic_contributions(agent, time, households, 
-							schools, workplaces, hospitals);
+							schools, workplaces);
 		}else{
 			throw std::runtime_error("Agent does not have any state");
 		}
 	}
 	contributions.total_place_contributions(households, schools, 
-											workplaces, hospitals);
+											workplaces);
 }
 
 // Determine infection propagation and
@@ -398,18 +316,15 @@ void ABM::compute_state_transitions()
 
 		if (agent.infected() == false){
 			newly_infected = transitions.susceptible_transitions(agent, time,
-							dt, infection, households, schools, workplaces, 
-							hospitals, infection_parameters, agents, flu);
+							dt, infection, households, schools, workplaces, infection_parameters, agents);
 			n_infected_tot += newly_infected;
 		}else if (agent.exposed() == true){
 			is_recovered = transitions.exposed_transitions(agent, infection, time, dt, 
-										households, schools, workplaces, hospitals,
-										infection_parameters);
+										households, schools, workplaces, infection_parameters);
 			n_recovered_tot += is_recovered;
 		}else if (agent.symptomatic() == true){
 			removed = transitions.symptomatic_transitions(agent, time, dt,
-							infection, households, schools, workplaces, hospitals,
-							infection_parameters);
+							infection, households, schools, workplaces, infection_parameters);
 			n_recovered_tot += removed.at(0);
 			n_dead_tot += removed.at(1);
 		}else{
@@ -515,12 +430,6 @@ void ABM::print_workplaces(const std::string fname) const
 	print_places<Workplace>(workplaces, fname);
 }
 
-// Save current hospital information to file 
-void ABM::print_hospitals(const std::string fname) const
-{
-	print_places<Hospital>(hospitals, fname);
-}
-
 // Save IDs of all agents in all households
 void ABM::print_agents_in_households(const std::string filename) const
 {
@@ -539,11 +448,6 @@ void ABM::print_agents_in_workplaces(const std::string filename) const
 	print_agents_in_places<Workplace>(workplaces, filename);
 }
 
-// Save IDs of all agents in all hospitals 
-void ABM::print_agents_in_hospitals(const std::string filename) const
-{
-	print_agents_in_places<Hospital>(hospitals, filename);
-}
 
 // Save current agent information to file 
 void ABM::print_agents(const std::string fname) const

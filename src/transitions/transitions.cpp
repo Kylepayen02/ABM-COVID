@@ -12,19 +12,14 @@
 int Transitions::susceptible_transitions(Agent& agent, const double time, 
 				const double dt, Infection& infection,	
 				std::vector<Household>& households, std::vector<School>& schools,
-				std::vector<Workplace>& workplaces, std::vector<Hospital>& hospitals,
-				const std::map<std::string, double>& infection_parameters, std::vector<Agent>& agents, Flu& flu)
+				std::vector<Workplace>& workplaces,const std::map<std::string,
+				double>& infection_parameters, std::vector<Agent>& agents)
 {
 	bool got_infected_flu = false, got_infected_hsp_emp = false;
 	bool got_infected_hsp_pt = false, got_infected_reg = false;
 	int got_infected = 0;
 
-	if (agent.symptomatic_non_covid()){
-		got_infected = flu_tr.susceptible_transitions(agent, time, infection,
-				households, schools, workplaces, hospitals, 
-				infection_parameters, agents, flu, dt);
-		got_infected_flu = static_cast<bool>(got_infected);
-	} else if (agent.hospital_employee()){
+	if (agent.hospital_employee()){
 		got_infected = hsp_emp_tr.susceptible_transitions(agent, time, infection,
 				households, schools, hospitals,	infection_parameters, agents);
 		got_infected_hsp_emp = static_cast<bool>(got_infected);
@@ -34,8 +29,7 @@ int Transitions::susceptible_transitions(Agent& agent, const double time,
 		got_infected_hsp_pt = static_cast<bool>(got_infected);
 	} else {
 		got_infected = regular_tr.susceptible_transitions(agent, time, infection,
-				households, schools, workplaces, hospitals, 
-				infection_parameters, agents, flu);
+				households, schools, workplaces,infection_parameters, agents);
 		got_infected_reg = static_cast<bool>(got_infected);
 	}
 

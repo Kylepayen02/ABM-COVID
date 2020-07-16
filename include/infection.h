@@ -52,38 +52,11 @@ public:
 	bool recovering_exposed();
 
 	/// \brief Determine if the agent will die based on agents age and total rate
-	/// \brief Computes probability from total rate and probability of dying in ICU
 	bool will_die_non_icu(const int age);
-
-	/// \brief Determine if the agent will be hospitalized 
-	bool agent_hospitalized(const int age);
-
-	/// \brief Determine if hospitalized in ICU
-	bool agent_hospitalized_ICU(const int age);
-
-	/// Determine if the agent will die in ICU
-	bool will_die_ICU();
 	
 	/// \brief Returns randomly chosen time left for agent to live
 	double time_to_death();
 
-	/// \brief Determines if the agent will get tested based on probability prob
-	bool will_be_tested(const double prob);
-	/// \brief Determines if the agent will get tested in a hospital based on probability prob
-	bool tested_in_hospital(const double prob);
-	/// \brief True if the test is false negative 
-	bool false_negative_test_result(const double);
-	/// \brief True if the test is false positive 
-	bool false_positive_test_result(const double);
-
-	/// \brief Returns time from symptomatic to hospitalization
-	double get_onset_to_hospitalization();
-	/// \brief Returns time from hospitalization to death
-	double get_hospitalization_to_death(); 
-
-	/// \brief Returns random hospital ID 
-	/// @param n_hsp - total number of hospitals
-	int get_random_hospital_ID(const int n_hsp); 
 	/// \brief Returns random house ID  
 	/// @param n_hs - total number of households 
 	int get_random_household_ID(const int n_hs);
@@ -100,21 +73,14 @@ public:
 
 	void set_onset_to_death_distribution(const double mean, const double std)
 		{ otd_mean = mean; otd_std = std; }
-	
-	void set_onset_to_hospitalization_distribution(const double k, const double theta)
-		{ oth_k = k; oth_theta = theta; }
-	
-	void set_hospitalization_to_death_distribution(const double k, const double theta)
-		{ htd_k = k; htd_theta = theta; }
 
 	/**
 	 * \brief Assing various single number probabilities
 	 * @param pr_e_rec - probability that exposed will recover without symptoms
 	 * @param pr_dth_icu - probability of death in ICU
 	 */
-	void set_other_probabilities(const double pr_e_rec, const double fr_sy_tested, const double pr_dth_icu)
-		{ prob_sy_tested = fr_sy_tested; prob_recovering_exposed = pr_e_rec; prob_death_icu = pr_dth_icu; 
-			prob_sym = 1 - prob_recovering_exposed; }
+	void set_other_probabilities(const double pr_e_rec)
+		{prob_recovering_exposed = pr_e_rec; prob_sym = 1 - prob_recovering_exposed; }
 
 	/**
 	 * \brief Process and store the age-dependent mortality rate distribution
@@ -122,17 +88,6 @@ public:
 	 */
 	void set_mortality_rates(const std::map<std::string, double> raw_rates);
 
-	/**
-	 * \brief Process and store the age-dependent hospitalization fraction distribution
-	 * @param raw_rates - map with string of age range (inclusive) to probability 
-	 */
-	void set_hospitalized_fractions(const std::map<std::string, double> raw_rates);
-
-	/**
-	 * \brief Process and store the age-dependent ICU hospitalization fraction distribution
-	 * @param raw_rates - map with string of age range (inclusive) to probability 
-	 */
-	void set_hospitalized_ICU_fractions(const std::map<std::string, double> raw_rates);
 
 	//
 	// Getters
@@ -141,12 +96,6 @@ public:
 	/// Return map with mortality rates
 	const std::map<std::string, std::tuple<int, int, double>>& get_mortality_rates() const 
 		{ return mortality_rates; }
-	/// Return map with hospitalization rates
-	const std::map<std::string, std::tuple<int, int, double>>& get_hospitalization_rates() const 
-		{ return hospitalization_rates; }
-	/// Return map with ICU rates
-	const std::map<std::string, std::tuple<int, int, double>>& get_ICU_rates() const 
-		{ return ICU_rates; }
 
 	//
 	// I/O
@@ -201,10 +150,6 @@ protected:
 	// without developing symptoms
 	double prob_recovering_exposed = 0.0; 
 
-	// Probability of symptomatic agent 
-	// getting tested
-	double prob_sy_tested = 0.0;
-
 	// Probability of dying in ICU
 	double prob_death_icu = 0.0;
 
@@ -220,10 +165,6 @@ protected:
 	
 	// Mortality rates (age group: min age, max age, probability)
 	std::map<std::string, std::tuple<int, int, double>> mortality_rates;
-	// Hospitalization rates (age group: min age, max age, probability)
-	std::map<std::string, std::tuple<int, int, double>> hospitalization_rates;
-	// ICU rates (age group: min age, max age, probability)
-	std::map<std::string, std::tuple<int, int, double>> ICU_rates;
 
 	//
 	// Private functions

@@ -93,17 +93,6 @@ public:
 	void create_workplaces(const std::string filename);
 
 	/**
-	 * \brief Create hospitals based on information in a file
-	 * \details Constructs hospitals based on the ID and
-	 * 				locations as defined in the file; One line
-	 * 				in the file defines one hospital 
-	 *	
-	 * @param filename - path of the file with input information
-	 * 
-	 */	
-	void create_hospitals(const std::string filename);
-
-	/**
 	 * \brief Create agents based on information in a file
 	 * \details Constructs agents from demographic information
 	 * 		in a file with agent per row, columns being the
@@ -271,8 +260,6 @@ public:
 	/// Return a const reference to parameter map
 	const std::map<std::string, double> get_infection_parameters() const
 		{ return infection_parameters; }
-	/// Return a copy of the Flu object
-	Flu get_flu_object() const { return flu; }
 private:
 
 	// General model attributes
@@ -300,9 +287,6 @@ private:
 	Transitions transitions;
 	// Class for setting agent state transitions
 	StatesManager states_manager;
-	// Class for creating and maintaining a population
-	// with flu i.e.  non-covid symptomatic
-	Flu flu;
 
 	// Vectors of individual model objects
 	std::vector<Agent> agents;

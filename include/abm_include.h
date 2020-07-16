@@ -33,6 +33,5 @@
 #include "agent.h"
 #include "infection.h"
 #include "contributions.h"
-#include "flu.h"
 
 #endif

@@ -42,11 +42,11 @@ public:
  	 * @param infected - true if Agent is infected
  	 */	
 	Agent(const bool student, const bool works, const int yrs, const double xi, 
-			const double yi, const int houseID, const bool isPatient, const int schoolID, 
-			const int workID, const bool worksHospital, const bool infected, bool fuck)
+			const double yi, const int houseID, const int schoolID,
+			const int workID, const bool infected)
 			: is_student(student), is_working(works), age(yrs),
-		   		x(xi), y(yi), house_ID(houseID), is_non_covid_patient(isPatient), school_ID(schoolID), 
-				work_ID(workID), works_at_hospital(worksHospital), is_infected(infected) { }
+		   		x(xi), y(yi), house_ID(houseID), school_ID(schoolID),
+				work_ID(workID), is_infected(infected) { }
 
 	//
 	// Infection related computations
@@ -77,17 +77,11 @@ public:
 	bool student() const { return is_student; }
 	/// True if agent works
 	bool works() const { return is_working; }
-	/// True if agent works at a hospital
-	bool hospital_employee() const { return works_at_hospital; }
-	/// True if agent is a hospital patient with condition other than COVID
-	bool hospital_non_covid_patient() const { return is_non_covid_patient; }
 
 	/// State getters
 	bool exposed() const { return is_exposed; }
 	bool recovering_exposed() const { return is_recovering_exposed; }
 	bool symptomatic() const { return is_symptomatic; }
-	bool symptomatic_non_covid() const { return is_symptomatic_non_covid;}
-    bool home_isolated() const { return is_home_isolated; }
 
 	// Removal
 	bool dying() const { return will_die; }
@@ -146,9 +140,7 @@ public:
 	void set_exposed(const bool val) { is_exposed = val; }
 	void set_recovering_exposed(const bool re) { is_recovering_exposed = re; }
 	void set_symptomatic(const bool val) { is_symptomatic = val; }
-	void set_symptomatic_non_covid(const bool val) { is_symptomatic_non_covid = val; }
 
-    void set_home_isolated(const bool val) { is_home_isolated = val; }
 	void set_dying(const bool val) { will_die = val; }
 	void set_recovering(const bool val) { will_recover = val; }
 	void set_removed(const bool val) { is_removed = val; }
@@ -198,14 +190,11 @@ private:
 
 	// Household ID
 	int house_ID = -1;
-	// Hospital patient with something else than COVID
-	bool is_non_covid_patient = false;
 
 	// School and work IDs and types
 	int school_ID = -1;
 	int work_ID = -1;
-	int agent_school_type = -1; 
-	bool works_at_hospital = false;
+	int agent_school_type = -1;
 
 	// Infection status
 	bool is_infected = false;
@@ -218,10 +207,8 @@ private:
 	// Recovering without ever developing symptoms
 	bool is_recovering_exposed = false;
 	bool is_symptomatic = false;
-	bool is_symptomatic_non_covid = false;
 
 	// Testing phases and types
-    bool is_home_isolated = false;
 	bool will_die = false;
 	bool will_recover = false;
 	bool is_removed = false;

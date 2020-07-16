@@ -17,7 +17,7 @@
 
 #include "common.h"
 #include "agent.h"
-#include "flu.h"
+
 
 /***************************************************** 
  * class: Contributions
@@ -50,7 +50,7 @@ public:
 	 */
 	void compute_exposed_contributions(const Agent& agent, const double time,	
 					std::vector<Household>& households, std::vector<School>& schools,
-					std::vector<Workplace>& workplaces, std::vector<Hospital>& hospitals);
+					std::vector<Workplace>& workplaces);
 
 	/** 
 	 * \brief Count contributions of a symptomatic agent
@@ -60,16 +60,15 @@ public:
 	 */
 	void compute_symptomatic_contributions(const Agent& agent, const double time,	
 					std::vector<Household>& households, std::vector<School>& schools,
-					std::vector<Workplace>& workplaces, std::vector<Hospital>& hospitals);
+					std::vector<Workplace>& workplaces);
 
 	/// \brief Compute the total contribution to infection probability at every place
 	void total_place_contributions(std::vector<Household>& households, 
-					std::vector<School>& schools, std::vector<Workplace>& workplaces, 
-					std::vector<Hospital>& hospitals);
+					std::vector<School>& schools, std::vector<Workplace>& workplaces);
 
 	/// \brief Set contributions/sums from all agents in places to 0.0 
 	void reset_sums(std::vector<Household>& households, std::vector<School>& schools,
-					std::vector<Workplace>& workplaces, std::vector<Hospital>& hospitals);
+					std::vector<Workplace>& workplaces);
 
 
 
@@ -83,22 +82,6 @@ private:
 	void compute_regular_symptomatic_contributions(const Agent& agent,  
 				const double inf_var, std::vector<Household>& households, 
 				std::vector<School>& schools, std::vector<Workplace>& workplaces);
-
-	/// \brief Count contributions of a symptomatic-hospital tested agent
-	void compute_hospital_tested_contributions(const Agent& agent, 
-				const double inf_var, std::vector<Hospital>& hospitals);   
-
-	/// \brief Count contributions of a home-isolated agent 
-	void compute_home_isolated_contributions(const Agent& agent, 
-				const double inf_vari, std::vector<Household>& households);   
-	
-	/// \brief Count contributions of a hospitalized agent
-	void compute_hospitalized_contributions(const Agent& agent, 
-				const double inf_var, std::vector<Hospital>& hospitals);   
-
-	/// \brief Count contributions of an agent hospitalized in ICU
-	void compute_hospitalized_ICU_contributions(const Agent& agent, 
-				const double inf_var, std::vector<Hospital>& hospitals);   
 
 };
 #endif

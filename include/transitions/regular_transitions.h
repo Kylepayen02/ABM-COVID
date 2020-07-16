@@ -19,7 +19,7 @@
 #include "../agent.h"
 #include "../infection.h"
 #include "../states_manager/regular_states_manager.h"
-#include "../flu.h"
+
 
 /***************************************************** 
  * class: RegularTransitions 
