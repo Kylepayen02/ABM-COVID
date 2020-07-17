@@ -132,8 +132,7 @@ std::vector<int> RegularTransitions::symptomatic_transitions(Agent& agent, const
 	// First entry is one if agent recovered, second if agent died
 	std::vector<int> removed = {0,0};
 	removed = check_agent_removal(agent, time, households, schools, workplaces);
-	if (agent.removed() == true)
-		return removed;
+	return removed;
 }
 
 // Verify if agent is to be removed at this step

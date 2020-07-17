@@ -192,7 +192,7 @@ void ABM::load_agents(const std::string fname)
 // Assign agents to households, schools, and workplaces
 void ABM::register_agents()
 {
-	int house_ID = 0, school_ID = 0, work_ID = 0, hospital_ID = 0;
+	int house_ID = 0, school_ID = 0, work_ID = 0;
 	int agent_ID = 0;
 	bool infected = false;
 
@@ -201,6 +201,11 @@ void ABM::register_agents()
 		// Agent ID and infection status
 		agent_ID = agent.get_ID();
 		infected = agent.infected();
+
+        // register in the household
+        house_ID = agent.get_household_ID();
+        Household& house = households.at(house_ID - 1);
+        house.register_agent(agent_ID, infected);
 
 
 		// Register in schools, workplaces, and hospitals 

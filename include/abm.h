@@ -186,15 +186,6 @@ public:
 	*/
 	void print_workplaces(const std::string filename) const;	
 
-	/**
-	 * \brief Save current hospital information 
-	 * \details Outputs hospital information as 
-	 * 		hospital ID, x and y location, total number
-	 * 		of agents, number of infected agents, ck, betas
-	 * 		One line per hospital		
-	 * @param filename - path of the file to print to
-	*/
-	void print_hospitals(const std::string filename) const;
 
 	/**
 	 * \brief Save IDs of all agents in all households
@@ -217,12 +208,6 @@ public:
 	*/
 	void print_agents_in_workplaces(const std::string filename) const;
 
-	/**
-	 * \brief Save IDs of all agents in all hospitals 
-	 * \details One line per hospital, 0 if no agents present
-	 * @param filename - path of the file to save to
-	*/
-	void print_agents_in_hospitals(const std::string filename) const;
 
 	/**
 	 * \brief Save current agent information 

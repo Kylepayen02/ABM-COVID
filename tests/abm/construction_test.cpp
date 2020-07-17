@@ -11,7 +11,6 @@ bool create_households_test();
 bool create_schools_test();
 bool wrong_school_type_test();
 bool create_workplaces_test();
-bool create_hospitals_test();
 bool create_agents_test();
 bool create_infection_model_test(const std::string = {}, const std::string = {});
 
@@ -47,7 +46,6 @@ int main()
 	test_pass(create_schools_test(), "School creation");
 	test_pass(wrong_school_type_test(), "Wrong school type detection");
 	test_pass(create_workplaces_test(), "Workplace creation");
-	test_pass(create_hospitals_test(), "Hospitals creation");
 	test_pass(create_agents_test(), "Agent creation");
 
 	std::string outfile_1 = "test_data/output_infection_parameters.txt";	
@@ -179,38 +177,6 @@ bool create_workplaces_test()
 	return compare_places_files(fin, fout, infection_parameters);	
 }
 
-// Checks hospital creation from file
-bool create_hospitals_test()
-{
-	// Create workplaces and save the information
-	std::string fin("test_data/hospitals_test.txt");
-	std::string fout("test_data/hospitals_out.txt");
-
-	// Model parameters
-	// Time step
-	double dt = 2.0;
-	// File with infection parameters
-	std::string pfname("test_data/sample_infection_parameters.txt");
-	// Files with age-dependent distributions
-	std::string dh_name("test_data/age_dist_hospitalization.txt");
-	std::string dhicu_name("test_data/age_dist_hosp_ICU.txt");
-	std::string dmort_name("test_data/age_dist_mortality.txt");
-	// Map for abm loading of distrinutions
-	std::map<std::string, std::string> dfiles = 
-		{ {"hospitalization", dh_name}, {"ICU", dhicu_name}, {"mortality", dmort_name} };	
-
-	ABM abm(dt, pfname, dfiles);
-
-	abm.create_hospitals(fin);
-	abm.print_hospitals(fout);
-	
-	// Vector of infection parameters 
-	// (order as in output file: ck, betas for each category)
-	std::vector<double> infection_parameters = {2.0, 0.47, 0.2009, 0.1, 0.90, 0.70}; 
-
-	// Check if correct, hardcoded for places properties
-	return compare_places_files(fin, fout, infection_parameters);	
-}
 
 // Checks agents creation from file including proper 
 // distribution into places 
@@ -256,7 +222,6 @@ bool create_agents_test()
 	abm.create_households(hfile);
 	abm.create_schools(sfile);
 	abm.create_workplaces(wfile);
-	abm.create_hospitals(hspfile);
 
 	// Then the agents
 	abm.create_agents(fin);
@@ -483,9 +448,6 @@ bool correctly_registered(const ABM abm, const std::vector<std::vector<int>> pla
 	} else if (place_type == "workplace"){
 		abm.print_workplaces(info_file);
 		abm.print_agents_in_workplaces(agent_file);
-	} else if (place_type == "hospital"){
-		abm.print_hospitals(info_file);
-		abm.print_agents_in_hospitals(agent_file);
 	} else{
 		std::cout << "Wrong place type" << std::endl;
 		return false; 

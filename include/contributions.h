@@ -9,7 +9,6 @@
 #include "places/household.h"
 #include "places/school.h"
 #include "places/workplace.h"
-#include "places/hospital.h"
 
 //
 // Other
