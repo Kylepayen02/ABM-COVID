@@ -11,12 +11,12 @@ bool abm_contributions_test();
 
 int main()
 {
-	test_pass(abm_contributions_test(), "Contributions to infection probability");	
+    test_pass(abm_contributions_test(), "Contributions to infection probability");
 }
 
 bool abm_contributions_test()
 {
-	// Create agents 
+	// Create agents
 	std::string fin("test_data/infection_tests/agents_test.txt");
 
 	// Files with place info
@@ -39,6 +39,7 @@ bool abm_contributions_test()
 
 	ABM abm(dt, pfname, dfiles);
 
+
 	// First the places
 	abm.create_households(hfile);
 	abm.create_schools(sfile);
@@ -46,6 +47,7 @@ bool abm_contributions_test()
 
 	// Then the agents
 	abm.create_agents(fin);
+
 
 	// Set infection variability coefficients
 	std::vector<double> inf_var = {0.1, 0.2, 0.3};

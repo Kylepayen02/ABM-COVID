@@ -203,10 +203,11 @@ void ABM::register_agents()
 		infected = agent.infected();
 
         // register in the household
-        house_ID = agent.get_household_ID();
-        Household& house = households.at(house_ID - 1);
-        house.register_agent(agent_ID, infected);
-
+        if (agent.get_household_ID() != 0){
+            house_ID = agent.get_household_ID();
+            Household& house = households.at(house_ID - 1);
+            house.register_agent(agent_ID, infected);
+        }
 
 		// Register in schools, workplaces, and hospitals 
 		if (agent.student()){
