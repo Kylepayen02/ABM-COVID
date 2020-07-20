@@ -159,10 +159,10 @@ void ABM::load_agents(const std::string fname)
 
 		house_ID = std::stoi(agent.at(5));
 
-		// No school or work if patient with condition other than COVID
+		// Check if agent is a student
 		if (std::stoi(agent.at(0)) == 1)
 			student = true;
-	   	// No work if a hospital employee	
+		// Check if agents works
 		if (std::stoi(agent.at(1)) == 1)
 			works = true; 
 			
@@ -196,20 +196,20 @@ void ABM::register_agents()
 	int agent_ID = 0;
 	bool infected = false;
 
-	for (const auto& agent : agents){
+	for (auto& agent : agents){
 		
 		// Agent ID and infection status
 		agent_ID = agent.get_ID();
 		infected = agent.infected();
 
         // register in the household
-        if (agent.get_household_ID() != 0){
-            house_ID = agent.get_household_ID();
-            Household& house = households.at(house_ID - 1);
-            house.register_agent(agent_ID, infected);
-        }
+        house_ID = infection.get_random_household_ID(households.size());
+        agent.set_household_ID(house_ID);
+        Household& house = households.at(house_ID - 1);
+        house.register_agent(agent_ID, infected);
 
-		// Register in schools, workplaces, and hospitals 
+
+		// Register in schools and workplaces
 		if (agent.student()){
 			school_ID = agent.get_school_ID();
 			School& school = schools.at(school_ID - 1); 
@@ -283,8 +283,7 @@ void ABM::compute_place_contributions()
 			continue;
 		}
 
-		// If susceptible and being tested - add to hospital's
-		// total number of people present at this time step
+
 		if (agent.infected() == false){
 			continue;
 		}
