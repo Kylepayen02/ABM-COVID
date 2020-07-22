@@ -34,11 +34,8 @@ public:
  	 * @param xi - x coordinate of the Agent
  	 * @param yi - y coordinate of the Agent
  	 * @param houseID - household ID
-	 * @param isPatient - true if hospitalized with a condition other than covid
  	 * @param schoolID - ID of the school Agent attends
  	 * @param workID - ID of the workplace Agent works at
-	 * @param worksHospital - true if agent works at a hospital
-	 * @param HospitalID - ID of the hospital where agent is staff or patient
  	 * @param infected - true if Agent is infected
  	 */	
 	Agent(const bool student, const bool works, const int yrs, const double xi, 

@@ -62,12 +62,10 @@ bool create_households_test()
 	// File with infection parameters
 	std::string pfname("test_data/sample_infection_parameters.txt");
 	// Files with age-dependent distributions
-	std::string dh_name("test_data/age_dist_hospitalization.txt");
-	std::string dhicu_name("test_data/age_dist_hosp_ICU.txt");
 	std::string dmort_name("test_data/age_dist_mortality.txt");
 	// Map for abm loading of distrinutions
 	std::map<std::string, std::string> dfiles = 
-		{ {"hospitalization", dh_name}, {"ICU", dhicu_name}, {"mortality", dmort_name} };	
+		{ {"mortality", dmort_name} };
 
 	ABM abm(dt, pfname, dfiles);
 
@@ -96,12 +94,10 @@ bool create_schools_test()
 	// File with infection parameters
 	std::string pfname("test_data/sample_infection_parameters.txt");
 	// Files with age-dependent distributions
-	std::string dh_name("test_data/age_dist_hospitalization.txt");
-	std::string dhicu_name("test_data/age_dist_hosp_ICU.txt");
 	std::string dmort_name("test_data/age_dist_mortality.txt");
 	// Map for abm loading of distrinutions
 	std::map<std::string, std::string> dfiles = 
-		{ {"hospitalization", dh_name}, {"ICU", dhicu_name}, {"mortality", dmort_name} };	
+		{{"mortality", dmort_name} };
 
 	ABM abm(dt, pfname, dfiles);
 	abm.create_schools(fin);
@@ -126,11 +122,9 @@ bool wrong_school_type_test()
 	std::string fin("test_data/schools_wrong_type.txt");
 	double dt = 2.0;
 	std::string pfname("test_data/sample_infection_parameters.txt");
-	std::string dh_name("test_data/age_dist_hospitalization.txt");
-	std::string dhicu_name("test_data/age_dist_hosp_ICU.txt");
 	std::string dmort_name("test_data/age_dist_mortality.txt");
 	std::map<std::string, std::string> dfiles = 
-		{ {"hospitalization", dh_name}, {"ICU", dhicu_name}, {"mortality", dmort_name} };	
+		{ {"mortality", dmort_name} };
 
 	ABM abm(dt, pfname, dfiles);
 	
@@ -153,12 +147,10 @@ bool create_workplaces_test()
 	// File with infection parameters
 	std::string pfname("test_data/sample_infection_parameters.txt");
 	// Files with age-dependent distributions
-	std::string dh_name("test_data/age_dist_hospitalization.txt");
-	std::string dhicu_name("test_data/age_dist_hosp_ICU.txt");
 	std::string dmort_name("test_data/age_dist_mortality.txt");
 	// Map for abm loading of distrinutions
 	std::map<std::string, std::string> dfiles = 
-		{ {"hospitalization", dh_name}, {"ICU", dhicu_name}, {"mortality", dmort_name} };	
+		{ {"mortality", dmort_name} };
 
 	ABM abm(dt, pfname, dfiles);
 
@@ -346,25 +338,23 @@ bool compare_agents_files(std::string fname_in, std::string fname_out)
 
 	// Load the first file as vectors and generate IDs
 	std::vector<int> IDs;
-	// student, works, hospital staff, hospital patient
+	// student, works,
 	std::vector<std::vector<bool>> status;
 	std::vector<bool> infected;
 	std::vector<int> age;
 	std::vector<std::vector<double>> position;
-	// house ID, school ID, work ID, hospital ID
+	// house ID, school ID, work ID,
 	std::vector<std::vector<int>> places;		 
 	
 	int ID = 0, yrs = 0, hID = 0, sID = 0, wID = 0, hspID = 0;
 	bool studies = false, works = false, is_infected = false;
-	bool works_at_hospital = false, non_covid_patient = false;
 	double x = 0.0, y = 0.0;
 
 	while (input >> studies >> works >> yrs 
-			>> x >> y >> hID >> non_covid_patient >> sID >> wID 
-			>> works_at_hospital >> hspID >> is_infected)
+			>> x >> y >> hID >> sID >> wID >> is_infected)
 	{
 		IDs.push_back(++ID);
-		status.push_back({studies, works, works_at_hospital, non_covid_patient});
+		status.push_back({studies, works});
 		infected.push_back(is_infected);
 		age.push_back(yrs);
 		position.push_back({x, y});
@@ -374,15 +364,13 @@ bool compare_agents_files(std::string fname_in, std::string fname_out)
 	// Now load the second (output) file and compare
 	int ind = 0;
 	while (output >> ID >> studies >> works >> yrs 
-			>> x >> y >> hID >> non_covid_patient >> sID >> wID 
-			>> works_at_hospital >> hspID >> is_infected)
+			>> x >> y >> hID >> sID >> wID
+			>> is_infected)
 	{
 		if (ID != IDs.at(ind))
 			return false;
 		if (studies != status.at(ind).at(0) 
-				|| works != status.at(ind).at(1)
-				|| works_at_hospital != status.at(ind).at(2)
-				|| non_covid_patient != status.at(ind).at(3))
+				|| works != status.at(ind).at(1))
 			return false;
 		if (is_infected != infected.at(ind))
 			return false;
@@ -394,8 +382,7 @@ bool compare_agents_files(std::string fname_in, std::string fname_out)
 			return false;
 		if (hID != places.at(ind).at(0) 
 				|| sID != places.at(ind).at(1) 
-				|| wID != places.at(ind).at(2)
-				|| hspID != places.at(ind).at(3))
+				|| wID != places.at(ind).at(2))
 			return false;
 		++ind;
 	}
