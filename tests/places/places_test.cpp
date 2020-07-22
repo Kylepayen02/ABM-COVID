@@ -39,9 +39,6 @@ int main()
 
 	test_pass(workplace_test(), "Workplace class functionality");
 	test_pass(contribution_test_workplace(), "Contribution test for workplace");
-
-	test_pass(hospital_test(), "Hospital class functionality");
-	test_pass(contribution_test_hospitals(), "Contribution test for hospitals");
 	
 	test_pass(household_test(), "Household class functionality");
 	test_pass(contribution_test_household(), "Contribution test for household");
@@ -150,70 +147,7 @@ bool contribution_test_workplace()
 	return true;
 }
 
-/// Tests all public functions from the Hospital class  
-bool hospital_test()
-{
-	int pID = 10760; 
-	double xi = 5.901, yi = 10010.675;
-	double severity_cor = 2.5;
-	std::map<const std::string, const double> betas = {{"hospital employee", 0.5}, 
-							{"hospital non-COVID patient", 1.3}, 
-							{"hospital testee", 0.009}, {"hospitalized", 0.1},
-							{"hospitalized ICU", 0.07}};
-	
 
-	Hospital hospital(pID, xi, yi, severity_cor, betas);
-	
-	if (!general_place_test(hospital, pID, xi, yi, severity_cor, 0.0, -1.0, -1.0, -1.0,  betas))
-		return false;
-
-	return true;
-}
-
-/// Test computation of probability contribution in hospitals
-bool contribution_test_hospitals()
-{
-	int pID = 10760; 
-	double xi = 5.901, yi = 10010.675;
-	int ntot = 20.0;
-	double severity_cor = 2.5;
-	double inf_var = 0.2;
-	int n_exposed = 5, n_hospitalized = 3;
-	std::map<const std::string, const double> betas = {{"hospital employee", 0.5}, 
-							{"hospital non-COVID patient", 1.3}, 
-							{"hospital testee", 0.009}, {"hospitalized", 0.1},
-							{"hospitalized ICU", 0.07}};
-	
-	// Expected fraction added to total lambda and computed lambda initialization
-	double exp_lambda = 0.0475, lambda = 0.0;
-
-	// Check contributions
-	// Set total number of agents
-	Hospital hospital(pID, xi, yi, severity_cor, betas);
-
-	for (int i=0; i<ntot; ++i)
-		hospital.add_agent(i+1);
-
-	for (int i=0; i<(n_exposed+n_hospitalized); ++i){
-		if (i < n_exposed)
-			hospital.add_exposed(inf_var);
-		else if (i >= n_exposed)
-			hospital.add_hospitalized(inf_var);	
-	}
-
-	// The rest has only one agent
-	hospital.add_exposed_patient(inf_var);
-	hospital.add_hospital_tested(inf_var);
-	hospital.add_hospitalized_ICU(inf_var);
-
-	hospital.compute_infected_contribution();
-
-	lambda = hospital.get_infected_contribution();
-	if (!float_equality<double>(exp_lambda, lambda, 1e-3))
-		return false;
-
-	return true;
-}
 
 /// Tests all public functions from the Household class  
 bool household_test()

@@ -48,11 +48,11 @@ for file_rm in const_files:
 # Test 1
 # Initialization and construction 
 # Name of the executable
-# exe_name = 'con_test'
+exe_name = 'con_test'
 # Files needed only for this build
-# spec_files = 'construction_test.cpp '
-# compile_com = ' '.join([cx, std, opt, '-o', exe_name, spec_files, tst_files, src_files])
-# subprocess.call([compile_com], shell=True)
+spec_files = 'construction_test.cpp '
+compile_com = ' '.join([cx, std, opt, '-o', exe_name, spec_files, tst_files, src_files])
+subprocess.call([compile_com], shell=True)
 
 # Test 2
 # Transmission of the infection 

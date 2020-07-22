@@ -34,30 +34,6 @@ bool test_states_on_off()
 		return false;
 	if (!set_and_get(&Agent::set_symptomatic, &Agent::symptomatic, agent))
 		return false;
- 	if (!set_and_get(&Agent::set_tested_covid_negative, &Agent::tested_covid_negative, agent))
-		return false;
-	if (!set_and_get(&Agent::set_tested_false_negative, &Agent::tested_false_negative, agent))
-		return false;
-	if (!set_and_get(&Agent::set_tested_false_positive, &Agent::tested_false_positive, agent))
-		return false;
-	if (!set_and_get(&Agent::set_tested, &Agent::tested, agent))
-		return false;
-	if (!set_and_get(&Agent::set_tested_in_car, &Agent::tested_in_car, agent))
-		return false;
-	if (!set_and_get(&Agent::set_tested_in_hospital, &Agent::tested_in_hospital, agent))
-		return false;
-	if (!set_and_get(&Agent::set_tested_awaiting_results, &Agent::tested_awaiting_results, agent))
-		return false;
-	if (!set_and_get(&Agent::set_tested_awaiting_test, &Agent::tested_awaiting_test, agent))
-		return false;
-	if (!set_and_get(&Agent::set_being_treated, &Agent::being_treated, agent))
-		return false;
-	if (!set_and_get(&Agent::set_home_isolated, &Agent::home_isolated, agent))
-		return false;
-	if (!set_and_get(&Agent::set_hospitalized, &Agent::hospitalized, agent))
-		return false;
-	if (!set_and_get(&Agent::set_hospitalized_ICU, &Agent::hospitalized_ICU, agent))
-		return false;
 	if (!set_and_get(&Agent::set_dying, &Agent::dying, agent))
 		return false;
 	if (!set_and_get(&Agent::set_recovering, &Agent::recovering, agent))

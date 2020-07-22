@@ -19,13 +19,10 @@ bool infection_out_test();
 
 // Supporting functions
 bool check_mortality_rates(Infection&);
-bool check_hospitalization_rates(Infection&);
-bool check_ICU_rates(Infection&);
 bool check_age_dependent_rates(age_rates_setter, age_rates_getter, age_rates_caller,
 								Infection&,	std::map<std::string, double>, 
 								std::map<std::string, std::tuple<int, int, double>>);
 bool check_distribution(dist_sampling, Infection&, double);
-bool check_simple_distributions(Infection&, std::vector<double>);
 bool check_random_ID(Infection&);
 
 int main()
@@ -54,8 +51,7 @@ bool infection_transmission_test()
 	infection.set_inf_variability_distribution(k, theta);
 
 	infection.set_onset_to_death_distribution(otd_mu, otd_sigma);
-	infection.set_onset_to_hospitalization_distribution(oth_k, oth_theta);
-	infection.set_hospitalization_to_death_distribution(ohd_k, ohd_theta);
+
 
 	// Infection
 	// Should be infected
@@ -67,28 +63,12 @@ bool infection_transmission_test()
 
 	// Exposed recovering without symptoms
 	// and agent not dying in ICU
-	infection.set_other_probabilities(1.0, 0.0, 0.0);
-	if (infection.recovering_exposed() == false
-		 || infection.will_die_ICU() == true)
-		return false;
-	// Becoming symptomatic and dying in ICU
-	infection.set_other_probabilities(0.0, 1.0, 1.0);
-	if (infection.recovering_exposed() == true
-		 || infection.will_die_ICU() == false)
-		return false;
+	//infection.set_other_probabilities(1.0, 0.0, 0.0);
 
 	// Age-dependent rates 
 	if (!check_mortality_rates(infection))
 		return false;
-	if (!check_hospitalization_rates(infection))
-		return false;
-	if (!check_ICU_rates(infection))
-		return false;
 
-	// Check all single number distributions
-	std::vector<double> dist_probs = {0.25, 0.9, 0.05, 0.1};
-	if (!check_simple_distributions(infection, dist_probs))
-		return false;	
 
 	// Check genration of random place ID functions
 	if (!check_random_ID(infection))
@@ -100,11 +80,7 @@ bool infection_transmission_test()
 	if (!check_distribution(&Infection::inf_variability, infection, mean_var))
 		return false;	
 	if (!check_distribution(&Infection::time_to_death, infection, mean_otd))
-		return false;		
-	if (!check_distribution(&Infection::get_onset_to_hospitalization, infection, mean_oth))
-		return false;		
-	if (!check_distribution(&Infection::get_hospitalization_to_death, infection, mean_ohd))
-		return false;		
+		return false;
 	
 	return true;
 }
@@ -169,61 +145,8 @@ bool check_mortality_rates(Infection& infection)
 					&Infection::will_die_non_icu, infection, raw_mortality_rates, mortality_rates);
 }
 
-/// Test if generated hospitalization rates correspond to actual
-bool check_hospitalization_rates(Infection& infection)
-{
-	// Input
-	std::map<std::string, double> raw_rates = {{"0-9", 0.001},  
-			{"10-19", 0.003}, {"20-29", 0.012}, {"30-39", 0.032},
-			{"40-49", 0.049}, {"50-59", 0.102}, {"60-69", 0.166},
-			{"70-79", 0.243}, {"80-120", 0.273}};	
 
-	// Expected output
-	std::map<std::string, std::tuple<int, int, double>> hsp_rates = 
-					   {{"0-9", std::make_tuple(0, 9, 0.001)},
-						{ "10-19", std::make_tuple(10, 19, 0.003)},
-						{ "20-29", std::make_tuple(20, 29, 0.012)},
-						{ "30-39", std::make_tuple(30, 39, 0.032)},
-						{ "40-49", std::make_tuple(40, 49, 0.049)},
-						{ "50-59", std::make_tuple(50, 59, 0.102)},
-						{ "60-69", std::make_tuple(60, 69, 0.166)},
-						{ "70-79", std::make_tuple(70, 79, 0.243)},
-						{ "80-120", std::make_tuple(80, 120, 0.273)}};
 
-	// Verification 
-	return check_age_dependent_rates(&Infection::set_hospitalized_fractions, 
-									 &Infection::get_hospitalization_rates,
-									 &Infection::agent_hospitalized,
-									 infection, raw_rates, hsp_rates);
-}
-
-/// Test if generated ICU rates correspond to actual
-bool check_ICU_rates(Infection& infection)
-{
-	// Input
-	std::map<std::string, double> raw_rates = {{"0-9", 0.05},  
-			{"10-19", 0.05}, {"20-29", 0.05}, {"30-39", 0.05},
-			{"40-49", 0.063}, {"50-59", 0.122}, {"60-69", 0.274},
-			{"70-79", 0.432}, {"80-120", 0.709}};	
-
-	// Expected output
-	std::map<std::string, std::tuple<int, int, double>> hsp_rates = 
-					   {{"0-9", std::make_tuple(0, 9, 0.05)},
-						{ "10-19", std::make_tuple(10, 19, 0.05)},
-						{ "20-29", std::make_tuple(20, 29, 0.05)},
-						{ "30-39", std::make_tuple(30, 39, 0.05)},
-						{ "40-49", std::make_tuple(40, 49, 0.063)},
-						{ "50-59", std::make_tuple(50, 59, 0.122)},
-						{ "60-69", std::make_tuple(60, 69, 0.274)},
-						{ "70-79", std::make_tuple(70, 79, 0.432)},
-						{ "80-120", std::make_tuple(80, 120, 0.709)}};
-
-	// Verification 
-	return check_age_dependent_rates(&Infection::set_hospitalized_ICU_fractions, 
-									 &Infection::get_ICU_rates,
-									 &Infection::agent_hospitalized_ICU,
-									 infection, raw_rates, hsp_rates);
-}
 
 /// \brief Function for checking different types of age-dependent rates
 bool check_age_dependent_rates(age_rates_setter set_rates, age_rates_getter get_rates,
@@ -282,45 +205,6 @@ bool check_distribution(dist_sampling dist, Infection& infection, double exp_mea
 	return true;
 }
 
-/// \brief Verification for single number distributions
-bool check_simple_distributions(Infection& infection, std::vector<double> probabilities)
-{
-	// Total number of outcomes
-	int n_tot = 1e6;
-	// Measured number of outcomes that are true
-	int n_tested = 0, n_tested_hsp = 0, n_fneg = 0, n_fpos = 0;
-
-	// For each probability, collect agents that have
-	// the value "True"
-	for (int i=0; i<n_tot; ++i){
-		if (infection.will_be_tested(probabilities.at(0)))
-			++n_tested;
-		if (infection.tested_in_hospital(probabilities.at(1)))
-			++n_tested_hsp;
-		if (infection.false_negative_test_result(probabilities.at(2)))
-			++n_fneg;
-		if (infection.false_positive_test_result(probabilities.at(3)))
-			++n_fpos;			
-	}
-
-	// Compute ratios and compare to expected
-	double fr_tested = static_cast<double>(n_tested)/(static_cast<double>(n_tot));
-	double fr_tested_hsp = static_cast<double>(n_tested_hsp)/(static_cast<double>(n_tot));
-	double fr_fneg = static_cast<double>(n_fneg)/(static_cast<double>(n_tot));
-	double fr_fpos = static_cast<double>(n_fpos)/(static_cast<double>(n_tot));
-
-	if (!float_equality<double>(fr_tested, probabilities.at(0), 0.01))
-		return false;
-	if (!float_equality<double>(fr_tested_hsp, probabilities.at(1), 0.01))
-		return false;
-	if (!float_equality<double>(fr_fneg, probabilities.at(2), 0.01))
-		return false;
-	if (!float_equality<double>(fr_fpos, probabilities.at(3), 0.01))
-		return false;
-
-	return true;
-}
-
 /// \brief Verification of functionality for generating random IDs
 bool check_random_ID(Infection& infection)
 {
@@ -337,12 +221,9 @@ bool check_random_ID(Infection& infection)
 	int n_tot = 1000;
 	for (int i=0; i<n_tot; ++i){
 		++houses.at(infection.get_random_household_ID(n_hs)-1);
-		++hospitals.at(infection.get_random_hospital_ID(n_hsp)-1);
 	}
 
 	if (std::find(houses.begin(), houses.end(), 0) != houses.end())
-		return false;
-	if (std::find(hospitals.begin(), hospitals.end(), 0) != hospitals.end())
 		return false;
 
 	return true;

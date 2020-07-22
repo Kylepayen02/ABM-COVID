@@ -26,18 +26,14 @@ bool correctly_registered(const ABM, const std::vector<std::vector<int>>,
 // test_data/houses_test.txt
 // test_data/schools_test.txt
 // test_data/workplaces_test.txt
-// test_data/hospitals_test.txt
 // test_data/agents_test.txt
 // test_data/sample_infection_parameters.txt
-// test_data/age_dist_hospitalization.txt
-// test_data/age_dist_hosp_ICU.txt
 // test_data/age_dist_mortality.txt
 
 // Files to delete before running 
 // test_data/houses_out.txt
 // test_data/schools_out.txt
 // test_data/workplaces_out.txt
-// test_data/hospitals_out.txt
 // test_data/agents_out.txt
 
 int main()
@@ -190,31 +186,26 @@ bool create_agents_test()
 	std::string hfile("test_data/houses_test.txt");
 	std::string sfile("test_data/schools_test.txt");
 	std::string wfile("test_data/workplaces_test.txt");
-	std::string hspfile("test_data/hospitals_test.txt");
 
 	// Files for checking registration failures
 	std::string hinfo("test_data/houses_basic_info.txt");
 	std::string sinfo("test_data/schools_basic_info.txt");
 	std::string winfo("test_data/works_basic_info.txt");
-	std::string hsp_info("test_data/hospitals_basic_info.txt");
 
 	// .. including correct registered agents IDs
 	std::string hagnt("test_data/houses_agent_IDs.txt");
 	std::string sagnt("test_data/schools_agent_IDs.txt");
 	std::string wagnt("test_data/works_agent_IDs.txt");
-	std::string hsp_agnt("test_data/hospitals_agent_IDs.txt");
 
 	// Model parameters
 	double dt = 2.0;
 	// File with infection parameters
 	std::string pfname("test_data/sample_infection_parameters.txt");
 	// Files with age-dependent distributions
-	std::string dh_name("test_data/age_dist_hospitalization.txt");
-	std::string dhicu_name("test_data/age_dist_hosp_ICU.txt");
 	std::string dmort_name("test_data/age_dist_mortality.txt");
 	// Map for abm loading of distrinutions
 	std::map<std::string, std::string> dfiles = 
-		{ {"hospitalization", dh_name}, {"ICU", dhicu_name}, {"mortality", dmort_name} };	
+		{ {"mortality", dmort_name} };
 
 	ABM abm(dt, pfname, dfiles);
 
@@ -237,21 +228,17 @@ bool create_agents_test()
 	std::vector<std::vector<int>> houses = {{3, 1}, {1, 0}, {1, 0}};
 	std::vector<std::vector<int>> schools = {{2, 1}, {0, 0}, {1, 0}, {0, 0}};
 	std::vector<std::vector<int>> workplaces = {{0, 0}, {1, 0}};
-	std::vector<std::vector<int>> hospitals = {{1, 0}, {1, 0}};
 
 	// Expected agents in each place by ID
 	std::vector<std::vector<int>> houses_agents = {{4, 5, 6}, {2}, {3}};
 	std::vector<std::vector<int>> schools_agents = {{4, 5}, {0}, {3}, {0}};
 	std::vector<std::vector<int>> workplaces_agents = {{0}, {2}};
-	std::vector<std::vector<int>> hospital_agents = {{3}, {1}};
 
 	if (!correctly_registered(abm, houses, houses_agents, "House", hinfo, hagnt, 4))
 		return false;
 	if (!correctly_registered(abm, schools, schools_agents, "school", sinfo, sagnt, 3))
 		return false;
 	if (!correctly_registered(abm, workplaces, workplaces_agents, "Workplace", winfo, wagnt, 3))
-		return false;
-	if (!correctly_registered(abm, hospitals, hospital_agents, "hospital", hsp_info, hsp_agnt, 6))
 		return false;
 	 
 	return true;
@@ -269,12 +256,10 @@ bool create_infection_model_test(const std::string outfile_1, const std::string 
 	// File with infection parameters
 	std::string pfname("test_data/sample_infection_parameters.txt");
 	// Files with age-dependent distributions
-	std::string dh_name("test_data/age_dist_hospitalization.txt");
-	std::string dhicu_name("test_data/age_dist_hosp_ICU.txt");
 	std::string dmort_name("test_data/age_dist_mortality.txt");
 	// Map for abm loading of distrinutions
 	std::map<std::string, std::string> dfiles = 
-		{ {"hospitalization", dh_name}, {"ICU", dhicu_name}, {"mortality", dmort_name} };	
+		{ {"mortality", dmort_name} };
 
 	ABM abm(dt, pfname, dfiles);
 
