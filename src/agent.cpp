@@ -40,7 +40,8 @@ int Agent::get_interactions(const std::vector<Agent>& agents){
     for (const Agent& agent : agents){
         if (ID == agent.get_ID())
             continue;
-        if (!agent.removed()){
+        // If agent is not removed by death
+        if (!agent.get_dead()){
             if (house_ID == agent.get_household_ID()
                 || work_ID == agent.get_work_ID()
                 || school_ID == agent.get_school_ID())

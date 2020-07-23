@@ -85,6 +85,9 @@ public:
 	bool recovering() const { return will_recover; }
 	bool removed() const { return is_removed; }
 
+	bool get_dead() const { return dead; }
+	bool get_recovered() const { return recovered; }
+
 	/// Get infectiousness variability factor of an agent
 	double get_inf_variability_factor() const { return inf_var; }
 	/// Get latency end time
@@ -144,6 +147,9 @@ public:
 	void set_dying(const bool val) { will_die = val; }
 	void set_recovering(const bool val) { will_recover = val; }
 	void set_removed(const bool val) { is_removed = val; }
+
+	void set_dead(const bool val) { dead = val; }
+	void set_recovered(const bool val) { recovered = val; }
 
 	/// Set infectiousness variability factor of an agent
 	void set_inf_variability_factor(const double var) { inf_var = var; }
@@ -219,6 +225,9 @@ private:
 	bool will_die = false;
 	bool will_recover = false;
 	bool is_removed = false;
+
+	bool dead = false;
+	bool recovered = false;
 
 	// Infectiousness variability parameter
 	double inf_var = 1.0;

@@ -71,7 +71,12 @@ void RegularStatesManager::set_recovering_symptomatic(Agent& agent)
 // Set all removed related states
 void RegularStatesManager::set_any_to_removed(Agent& agent)
 {
-	agent.set_removed(true);
+    if (agent.dying())
+        agent.set_dead(true);
+    else if (agent.recovering())
+        agent.set_recovered(true);
+
+    agent.set_removed(true);
 
 	agent.set_dying(false);
 	agent.set_recovering(false);	
