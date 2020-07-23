@@ -95,6 +95,9 @@ public:
 	double get_time_of_death() const { return death_time; }
 	/// Get time of recovery
 	double get_recovery_time() const { return recovery_time; }
+	/// Get num of interactions at each timestep
+	std::vector<int>& get_all_interactions() { return all_interactions; }
+	int get_num_interactions() const { return num_interactions; }
 
 	//
 	// Setters
@@ -145,6 +148,8 @@ public:
 	/// Set infectiousness variability factor of an agent
 	void set_inf_variability_factor(const double var) { inf_var = var; }
 
+	void set_num_interaction(const int num) { num_interactions = num; }
+
 	//
 	// I/O
 	//
@@ -156,6 +161,11 @@ public:
 	 * 	@param where - output stream
 	 */	
 	void print_basic(std::ostream& where) const;
+
+    /**
+     * \brief Retrieve number of agent interactions for each agent
+     */
+    int get_interactions(const std::vector<Agent>& agents);
 
 private:
 
@@ -213,6 +223,12 @@ private:
 	// Infectiousness variability parameter
 	double inf_var = 1.0;
 
+	// Number of interactions at each timestep
+	std::vector<int> all_interactions;
+
+	// Number of interactions between agents
+	int num_interactions = 0;
+
 	//
 	// Private member functions
 	//
@@ -226,6 +242,8 @@ private:
  	 * @returns Value of the distance function
 	 */	
 	double distance_function(const double a, const double b, const double dij) const;
+
+
 };
 
 /// Overloaded ostream operator for I/O

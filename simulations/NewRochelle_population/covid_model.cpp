@@ -59,7 +59,10 @@ int main()
 		}*/
 		infected_count.at(ti) = abm.get_num_infected();	
 		abm.transmit_infection();
+
 	}
+
+	abm.output_interactions();
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;

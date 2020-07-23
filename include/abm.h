@@ -216,7 +216,13 @@ public:
 	 * 		One line per agent		
 	 * @param filename - path of the file to print to
 	*/
-	void print_agents(const std::string filename) const;	
+	void print_agents(const std::string filename) const;
+
+    /**
+     * \brief Output number of agent interactions for each agent into a txt file
+     */
+
+    void output_interactions();
 	
 	//
 	// Functions mainly for testing
@@ -314,9 +320,10 @@ private:
 	void load_agents(const std::string fname);
 
 	/**
-	 * \brief Assign agents to households, schools, and worplaces
+	 * \brief Assign agents to households, schools, and workplaces
 	 */
 	void register_agents();
+
 };
 
 // Write Place objects
@@ -357,5 +364,7 @@ void ABM::print_agents_in_places(std::vector<T> places, const std::string fname)
 	AbmIO abm_io(fname, delim, sflag, dims);
 	abm_io.write_vector<int>(agents_all_places);
 }
+
+
 
 #endif

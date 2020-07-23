@@ -265,6 +265,14 @@ void ABM::transmit_infection()
 
 	// Determine and update state transitions
 	compute_state_transitions();
+
+	for (Agent& agent : agents)
+    {
+	    agent.set_num_interaction(0);
+	    // Get the number of interactions between all other agents
+	    int num = agent.get_interactions(agents);
+	    agent.get_all_interactions().push_back(num);
+    }
 	
 	// Reset the place sums
 	contributions.reset_sums(households, schools, workplaces);
@@ -465,5 +473,15 @@ void ABM::print_agents(const std::string fname) const
 	// Write data to file
 	AbmIO abm_io(fname, delim, sflag, dims);
 	abm_io.write_vector<Agent>(agents);	
+}
+
+void ABM::output_interactions() {
+    std::ofstream out("interactions.txt");
+    for (Agent& agent : agents){
+        std::vector<int> interactions = agent.get_all_interactions();
+        out << agent.get_ID() << " ";
+        std::copy(interactions.begin(), interactions.end(), std::ostream_iterator<int>(out," "));
+        out << '\n';
+    }
 }
 

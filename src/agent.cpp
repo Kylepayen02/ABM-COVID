@@ -35,4 +35,19 @@ std::ostream& operator<< (std::ostream& out, const Agent& agent)
 	return out;
 }
 
-
+int Agent::get_interactions(const std::vector<Agent>& agents){
+    int count = 0;
+    for (const Agent& agent : agents){
+        if (ID == agent.get_ID())
+            continue;
+        if (!agent.removed()){
+            if (house_ID == agent.get_household_ID()
+                || work_ID == agent.get_work_ID()
+                || school_ID == agent.get_school_ID())
+            {
+                count += 1;
+            }
+        }
+    }
+    return count;
+}
