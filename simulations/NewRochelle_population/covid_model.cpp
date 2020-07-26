@@ -14,24 +14,22 @@ int main()
 	// Max number of steps to simulate
 	int tmax = 400;	
 	// Print agent info this many steps
-	int dt_out_agents = 100; 
+	int dt_out_agents = 401;
 
 	// Input files
 	std::string fin("input_data/NR_agents.txt");
 	std::string hfile("input_data/NR_households.txt");
 	std::string sfile("input_data/NR_schools.txt");
 	std::string wfile("input_data/NR_workplaces.txt");
-	std::string hsp_file("input_data/NR_hospitals.txt");
+
 
 	// File with infection parameters
 	std::string pfname("input_data/infection_parameters.txt");
-	// Files with age-dependent distributions
-	std::string dh_name("input_data/age_dist_hospitalization.txt");
-	std::string dhicu_name("input_data/age_dist_hosp_ICU.txt");
+	// Files with age-dependent distributions;
 	std::string dmort_name("input_data/age_dist_mortality.txt");
-	// Map for abm loading of distrinutions
+	// Map for abm loading of distributions
 	std::map<std::string, std::string> dfiles = 
-		{ {"hospitalization", dh_name}, {"ICU", dhicu_name}, {"mortality", dmort_name} };	
+		{ {"mortality", dmort_name} };
 
 	ABM abm(dt, pfname, dfiles);
 
@@ -42,6 +40,8 @@ int main()
 
 	// Then the agents
 	abm.create_agents(fin);
+
+	std::vector<Agent>* agents = &(abm.get_vector_of_agents_non_const());
 	
 	// Simulation
 	// Collect infected agents and save
@@ -57,12 +57,16 @@ int main()
 			std::string fname = "output/agents_t_" + std::to_string(ti) + ".txt";
 			abm.print_agents(fname);
 		}*/
+
+        //Get the number of interactions for each agent
+        if (ti == 0){
+            abm.collect_all_interactions();
+        }
+
 		infected_count.at(ti) = abm.get_num_infected();	
 		abm.transmit_infection();
-
+		abm.collect_dead_interactions();
 	}
-
-	abm.output_interactions();
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
@@ -71,6 +75,12 @@ int main()
 	// Output infected
 	std::ofstream out("output/infected_with_time.txt");
 	std::copy(infected_count.begin(), infected_count.end(), std::ostream_iterator<int>(out," "));
+
+	// Output interactions
+    abm.output_interactions("interactions.txt");
+
+    //Output dead interactions
+    abm.output_dead_interactions("dead_interactions.txt");
 
 	// Print total values
 	std::cout << "Total number of infected agents: " << abm.get_total_infected() << "\n"

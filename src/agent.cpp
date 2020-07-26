@@ -35,20 +35,22 @@ std::ostream& operator<< (std::ostream& out, const Agent& agent)
 	return out;
 }
 
-int Agent::get_interactions(const std::vector<Agent>& agents){
-    int count = 0;
+std::vector<int> Agent::collect_interactions(const std::vector<Agent>& agents){
+    // First index for number of interactions, second for number of dead
+    std::vector<int> stats {0,0};
     for (const Agent& agent : agents){
         if (ID == agent.get_ID())
             continue;
         // If agent is not removed by death
-        if (!agent.get_dead()){
-            if (house_ID == agent.get_household_ID()
-                || work_ID == agent.get_work_ID()
-                || school_ID == agent.get_school_ID())
-            {
-                count += 1;
+        if (house_ID == agent.get_household_ID()
+            || work_ID == agent.get_work_ID()
+            || school_ID == agent.get_school_ID()){
+            if (!agent.get_dead()){
+                stats.at(0) += 1;
+            }else{
+                stats.at(1) += 1;
             }
         }
     }
-    return count;
+    return stats;
 }

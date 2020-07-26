@@ -69,8 +69,7 @@ void ABM::create_households(const std::string fname)
 			std::stod(house.at(1)), std::stod(house.at(2)),
 			infection_parameters.at("household scaling parameter"),
 			infection_parameters.at("severity correction"),
-			infection_parameters.at("household transmission rate"),
-			infection_parameters.at("transmission rate of home isolated"));
+			infection_parameters.at("household transmission rate"));
 		// Store 
 		households.push_back(temp_house);
 	}
@@ -154,8 +153,6 @@ void ABM::load_agents(const std::string fname)
 		bool student = false, works = false;
 		int house_ID = -1;
 
-		// Household ID only if not hospitalized with condition
-		// different than COVID-19
 
 		house_ID = std::stoi(agent.at(5));
 
@@ -203,6 +200,7 @@ void ABM::register_agents()
 		infected = agent.infected();
 
         // register in the household
+        // Assign agent to random household
         house_ID = infection.get_random_household_ID(households.size());
         agent.set_household_ID(house_ID);
         Household& house = households.at(house_ID - 1);
@@ -224,31 +222,57 @@ void ABM::register_agents()
 
 	} 
 }
+// Might use, might not
+// Initial set-up of exposed agents
+//void ABM::initial_exposed_with_never_sy(Agent& agent)
+//{
+//	bool never_sy = infection.recovering_exposed();
+//	// Total latency period
+//	double latency = infection.latency();
+//	// Portion of latency when the agent is not infectious
+//	double dt_ninf = std::min(infection_parameters.at("time from exposed to infectiousness"), latency);
+//
+//	if (never_sy){
+//		// Set to total latency + infectiousness duration
+//		double rec_time = infection_parameters.at("recovery time");
+//		agent.set_latency_duration(latency + rec_time);
+//		agent.set_latency_end_time(time);
+//		agent.set_infectiousness_start_time(time, dt_ninf);
+//	}else{
+//		// If latency shorter, then  not infectious during the entire latency
+//		agent.set_latency_duration(latency);
+//		agent.set_latency_end_time(time);
+//		agent.set_infectiousness_start_time(time, dt_ninf);
+//	}
+//	agent.set_inf_variability_factor(infection.inf_variability());
+//	agent.set_exposed(true);
+//	agent.set_recovering_exposed(never_sy);
+//}
 
 // Initial set-up of exposed agents
 void ABM::initial_exposed(Agent& agent)
 {
-	bool never_sy = infection.recovering_exposed();
-	// Total latency period
-	double latency = infection.latency();
-	// Portion of latency when the agent is not infectious
-	double dt_ninf = std::min(infection_parameters.at("time from exposed to infectiousness"), latency);
+    bool never_sy = infection.recovering_exposed();
+    // Total latency period
+    double latency = infection.latency();
+    // Portion of latency when the agent is not infectious
+    double dt_ninf = std::min(infection_parameters.at("time from exposed to infectiousness"), latency);
 
-	if (never_sy){
-		// Set to total latency + infectiousness duration
-		double rec_time = infection_parameters.at("recovery time");
-		agent.set_latency_duration(latency + rec_time);
-		agent.set_latency_end_time(time);
-		agent.set_infectiousness_start_time(time, dt_ninf);
-	}else{
-		// If latency shorter, then  not infectious during the entire latency
-		agent.set_latency_duration(latency);
-		agent.set_latency_end_time(time);
-		agent.set_infectiousness_start_time(time, dt_ninf);
-	}
-	agent.set_inf_variability_factor(infection.inf_variability());
-	agent.set_exposed(true);
-	agent.set_recovering_exposed(never_sy);
+    if (never_sy){
+        // Set to total latency + infectiousness duration
+        double rec_time = infection_parameters.at("recovery time");
+        agent.set_latency_duration(latency + rec_time);
+        agent.set_latency_end_time(time);
+        agent.set_infectiousness_start_time(time, dt_ninf);
+    }else{
+        // If latency shorter, then  not infectious during the entire latency
+        agent.set_latency_duration(latency);
+        agent.set_latency_end_time(time);
+        agent.set_infectiousness_start_time(time, dt_ninf);
+    }
+    agent.set_inf_variability_factor(infection.inf_variability());
+    agent.set_exposed(true);
+    agent.set_recovering_exposed(never_sy);
 }
 
 //
@@ -265,14 +289,6 @@ void ABM::transmit_infection()
 
 	// Determine and update state transitions
 	compute_state_transitions();
-
-	for (Agent& agent : agents)
-    {
-	    agent.set_num_interaction(0);
-	    // Get the number of interactions between all other agents
-	    int num = agent.get_interactions(agents);
-	    agent.get_all_interactions().push_back(num);
-    }
 	
 	// Reset the place sums
 	contributions.reset_sums(households, schools, workplaces);
@@ -475,12 +491,40 @@ void ABM::print_agents(const std::string fname) const
 	abm_io.write_vector<Agent>(agents);	
 }
 
-void ABM::output_interactions() {
-    std::ofstream out("interactions.txt");
+void ABM::collect_all_interactions(){
     for (Agent& agent : agents){
-        std::vector<int> interactions = agent.get_all_interactions();
+        // First index: # of interactions Second index: # of dead
+        std::vector<int> stats = agent.collect_interactions(agents);
+        std::vector<int>& interactions = agent.get_all_interactions();
+        interactions.push_back(stats.at(0));
+    }
+}
+
+void ABM::collect_dead_interactions() {
+    for (Agent& agent : agents){
+        // First index: # of interactions Second index: # of dead
+        std::vector<int> stats = agent.collect_interactions(agents);
+        std::vector<int>& dead_interactions = agent.get_dead_interactions();
+        dead_interactions.push_back(stats.at(1));
+    }
+}
+
+void ABM::output_interactions(std::string filename) {
+    std::ofstream out(filename);
+    for (Agent& agent : agents){
+        std::vector<int>& interactions = agent.get_all_interactions();
         out << agent.get_ID() << " ";
         std::copy(interactions.begin(), interactions.end(), std::ostream_iterator<int>(out," "));
+        out << '\n';
+    }
+}
+
+void ABM::output_dead_interactions(std::string filename) {
+    std::ofstream out(filename);
+    for (Agent& agent : agents){
+        std::vector<int>& dead_interactions = agent.get_dead_interactions();
+        out << agent.get_ID() << " ";
+        std::copy(dead_interactions.begin(), dead_interactions.end(), std::ostream_iterator<int>(out," "));
         out << '\n';
     }
 }

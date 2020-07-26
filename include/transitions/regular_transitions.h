@@ -76,6 +76,11 @@ private:
 	void recovery_and_incubation(Agent& agent, Infection& infection, const double time,
 				                const std::map<std::string, double>& infection_parameters);
 
+	//might keep, might not
+    // \brief Compute and set agent properties related to recovery without symptoms and incubation
+    //void recovery_and_incubation_with_never_sy(Agent& agent, Infection& infection, const double time,
+                                 //const std::map<std::string, double>& infection_parameters);
+
 
 	/// \brief Verifies and manages removal of an agent from the model
 	/// @return Vector where first entry is one if agent recovered, second if agent died

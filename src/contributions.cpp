@@ -46,10 +46,20 @@ void Contributions::compute_symptomatic_contributions(const Agent& agent, const 
 	// Agent's infection variability
 	double inf_var = 0.0;
 	inf_var = agent.get_inf_variability_factor();
-    // If regular symptomatic
-    compute_regular_symptomatic_contributions(agent, inf_var, households,
-                        schools, workplaces);
 
+    // Household
+    Household& household = households.at(agent.get_household_ID()-1);
+    household.add_symptomatic(inf_var);
+
+    // Other places
+    if (agent.student() == true){
+        School& school = schools.at(agent.get_school_ID()-1);
+        school.add_symptomatic(inf_var);
+    }
+    if (agent.works() == true){
+        Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
+        workplace.add_symptomatic(inf_var);
+    }
 }
 
 // Compute the total contribution to infection probability at every place
@@ -61,26 +71,6 @@ void Contributions::total_place_contributions(std::vector<Household>& households
 	std::for_each(households.begin(), households.end(), infected_contribution);
 	std::for_each(schools.begin(), schools.end(), infected_contribution);
 	std::for_each(workplaces.begin(), workplaces.end(), infected_contribution);
-}
-
-// Count contributions of a untreated and not tested symptomatic agent
-void Contributions::compute_regular_symptomatic_contributions(const Agent& agent, 
-				const double inf_var, std::vector<Household>& households, 
-				std::vector<School>& schools, std::vector<Workplace>& workplaces)
-{
-	// Household
-	Household& household = households.at(agent.get_household_ID()-1);
-	household.add_symptomatic(inf_var);
-
-	// Other places
-	if (agent.student() == true){
-		School& school = schools.at(agent.get_school_ID()-1);
-		school.add_symptomatic(inf_var);	
-	}
-	if (agent.works() == true){
-		Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
-		workplace.add_symptomatic(inf_var);
-	}
 }
 
 /// \brief Set contributions/sums from all agents in places to 0.0 

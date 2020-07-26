@@ -43,10 +43,9 @@ bool Infection::recovering_exposed()
 }
 
 // Determine if agent will die 
-bool Infection::will_die_non_icu(const int age)
+bool Infection::will_die(const int age)
 {
-	double tot_prob = 0.0, non_icu_prob =0.0;
-	double prob_hsp = 0.0, prob_hsp_icu = 0.0;
+	double tot_prob = 0.0;
 
 	// Probability of death 
 	for (const auto& mrt : mortality_rates){
@@ -56,11 +55,9 @@ bool Infection::will_die_non_icu(const int age)
 		}
 	}
 	// These numbers end up negative, need to rethink
-	non_icu_prob = tot_prob - prob_hsp*prob_hsp_icu*prob_death_icu;
-	non_icu_prob /= (1-prob_hsp*prob_hsp_icu);
 
 	// true if going to die
-	if (rng.get_random(0.0, 1.0) <= non_icu_prob)
+	if (rng.get_random(0.0, 1.0) <= tot_prob)
 		return true;
 	else
 		return false;	

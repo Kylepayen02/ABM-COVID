@@ -60,32 +60,61 @@ double RegularTransitions::compute_susceptible_lambda(const Agent& agent, const 
 }
 
 // Compute and set agent properties related to recovery without symptoms and incubation
+//void RegularTransitions::recovery_and_incubation_with_never_sy(Agent& agent, Infection& infection, const double time,
+//				const std::map<std::string, double>& infection_parameters)
+//{
+//	// Determine if agent will recover without
+//	// becoming symptomatic and update corresponding states
+//	bool never_sy = infection.recovering_exposed();
+//
+//	// Total latency period
+//	double latency = infection.latency();
+//	// Portion of latency when the agent is not infectious
+//	double dt_ninf = std::min(infection_parameters.at("time from exposed to infectiousness"), latency);
+//
+//	if (never_sy){
+//		states_manager.set_susceptible_to_exposed_never_symptomatic(agent);
+//		// Set to total latency + infectiousness duration
+//		double rec_time = infection_parameters.at("recovery time");
+//		agent.set_latency_duration(latency + rec_time);
+//		agent.set_latency_end_time(time);
+//		agent.set_infectiousness_start_time(time, dt_ninf);
+//	}else{
+//		// If latency shorter, then  not infectious during the entire latency
+//		states_manager.set_susceptible_to_exposed(agent);
+//		agent.set_latency_duration(latency);
+//		agent.set_latency_end_time(time);
+//		agent.set_infectiousness_start_time(time, dt_ninf);
+//	}
+//}
+
+// Compute and set agent properties related to recovery without symptoms and incubation
 void RegularTransitions::recovery_and_incubation(Agent& agent, Infection& infection, const double time,
-				const std::map<std::string, double>& infection_parameters)
+                                                 const std::map<std::string, double>& infection_parameters)
 {
-	// Determine if agent will recover without
-	// becoming symptomatic and update corresponding states
-	bool never_sy = infection.recovering_exposed();
+    // Determine if agent will recover without
+    // becoming symptomatic and update corresponding states
+    bool never_sy = infection.recovering_exposed();
 
-	// Total latency period
-	double latency = infection.latency();
-	// Portion of latency when the agent is not infectious
-	double dt_ninf = std::min(infection_parameters.at("time from exposed to infectiousness"), latency);
+    // Total latency period
+    double latency = infection.latency();
+    // Portion of latency when the agent is not infectious
+    double dt_ninf = std::min(infection_parameters.at("time from exposed to infectiousness"), latency);
 
-	if (never_sy){
-		states_manager.set_susceptible_to_exposed_never_symptomatic(agent);
-		// Set to total latency + infectiousness duration
-		double rec_time = infection_parameters.at("recovery time");
-		agent.set_latency_duration(latency + rec_time);
-		agent.set_latency_end_time(time);
-		agent.set_infectiousness_start_time(time, dt_ninf);
-	}else{
-		// If latency shorter, then  not infectious during the entire latency
-		states_manager.set_susceptible_to_exposed(agent);
-		agent.set_latency_duration(latency);
-		agent.set_latency_end_time(time);
-		agent.set_infectiousness_start_time(time, dt_ninf);
-	}
+    if (never_sy){
+        states_manager.set_susceptible_to_exposed_never_symptomatic(agent);
+        // Set to total latency + infectiousness duration
+        double rec_time = infection_parameters.at("recovery time");
+        agent.set_latency_duration(latency + rec_time);
+        agent.set_latency_end_time(time);
+        agent.set_infectiousness_start_time(time, dt_ninf);
+    }else{
+        // If latency shorter, then  not infectious during the entire latency
+        states_manager.set_susceptible_to_exposed(agent);
+        agent.set_latency_duration(latency);
+        agent.set_latency_end_time(time);
+        agent.set_infectiousness_start_time(time, dt_ninf);
+    }
 }
 
 // Implement transitions relevant to exposed 
@@ -107,7 +136,7 @@ int RegularTransitions::exposed_transitions(Agent& agent, Infection& infection, 
 			states_manager.set_exposed_to_symptomatic(agent);
 			// Removal settings
 			int agent_age = agent.get_age();
-			if (infection.will_die_non_icu(agent_age)){
+			if (infection.will_die(agent_age)){
 				states_manager.set_dying_symptomatic(agent);			
 				agent.set_time_to_death(infection.time_to_death());
 				agent.set_death_time(time);

@@ -52,7 +52,7 @@ public:
 	bool recovering_exposed();
 
 	/// \brief Determine if the agent will die based on agents age and total rate
-	bool will_die_non_icu(const int age);
+	bool will_die(const int age);
 	
 	/// \brief Returns randomly chosen time left for agent to live
 	double time_to_death();

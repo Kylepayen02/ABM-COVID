@@ -98,9 +98,10 @@ public:
 	double get_time_of_death() const { return death_time; }
 	/// Get time of recovery
 	double get_recovery_time() const { return recovery_time; }
-	/// Get num of interactions at each timestep
-	std::vector<int>& get_all_interactions() { return all_interactions; }
-	int get_num_interactions() const { return num_interactions; }
+	/// Get vector of agent interactions at each timestep
+	std::vector<int>& get_all_interactions() { return interactions; }
+	/// Get vector of dead agent interactions at each timestep
+	std::vector<int>& get_dead_interactions() { return dead_interactions; }
 
 	//
 	// Setters
@@ -154,7 +155,6 @@ public:
 	/// Set infectiousness variability factor of an agent
 	void set_inf_variability_factor(const double var) { inf_var = var; }
 
-	void set_num_interaction(const int num) { num_interactions = num; }
 
 	//
 	// I/O
@@ -169,9 +169,9 @@ public:
 	void print_basic(std::ostream& where) const;
 
     /**
-     * \brief Retrieve number of agent interactions for each agent
+     * \brief Retrieve number of agent interactions at timestep
      */
-    int get_interactions(const std::vector<Agent>& agents);
+    std::vector<int> collect_interactions(const std::vector<Agent>& agents);
 
 private:
 
@@ -233,10 +233,10 @@ private:
 	double inf_var = 1.0;
 
 	// Number of interactions at each timestep
-	std::vector<int> all_interactions;
+	std::vector<int> interactions;
+	// Number of dead agent interactions
+	std::vector<int> dead_interactions;
 
-	// Number of interactions between agents
-	int num_interactions = 0;
 
 	//
 	// Private member functions

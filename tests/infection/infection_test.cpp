@@ -142,7 +142,7 @@ bool check_mortality_rates(Infection& infection)
 
 	// Verification 
 	return check_age_dependent_rates(&Infection::set_mortality_rates, &Infection::get_mortality_rates,
-					&Infection::will_die_non_icu, infection, raw_mortality_rates, mortality_rates);
+					&Infection::will_die, infection, raw_mortality_rates, mortality_rates);
 }
 
 

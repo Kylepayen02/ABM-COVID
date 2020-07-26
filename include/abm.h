@@ -37,8 +37,7 @@ public:
 	 * \details Reads the infection parameters from the provided 
 	 * 				file and initializes Infection object;
 	 * 				The map key represents a tag to recognize which dataset
-	 * 				in question is it. Tags are currently: hospitalization, ICU, mortality
-	 * 				All 3 are required. 
+	 * 				in question is it. The only tag is mortality
 	 *
 	 * @param del_t - time step, days
 	 * @param infile - name of the file with the input parameters
@@ -97,8 +96,8 @@ public:
 	 * \details Constructs agents from demographic information
 	 * 		in a file with agent per row, columns being the
 	 *		information as it currently appears in the Agent
-	 *		constructor; assigns agents to households, schools,
-	 *		workplaces, and hospitals - needs to be called AFTER creating
+	 *		constructor; assigns agents to households, schools, and
+	 *		workplaces - needs to be called AFTER creating
 	 *		those places;
 	 *	
 	 * @param filename - path of the file with input information
@@ -219,10 +218,27 @@ public:
 	void print_agents(const std::string filename) const;
 
     /**
+     *  \brief Collect all interactions for each agent
+     */
+    void collect_all_interactions();
+
+    /**
+     *  \brief Collect all dead interactions for each agent
+     */
+     void collect_dead_interactions();
+
+    /**
      * \brief Output number of agent interactions for each agent into a txt file
+     * @param fil
      */
 
-    void output_interactions();
+    void output_interactions(std::string filename);
+
+    /**
+    * \brief Output number of dead agent interactions for each agent into a txt file
+    */
+
+    void output_dead_interactions(std::string filename);
 	
 	//
 	// Functions mainly for testing
@@ -301,6 +317,9 @@ private:
 	/// \brief Set properties of initially infected - exposed
 	void initial_exposed(Agent&);
 
+//Might use, might not
+    void initial_exposed_with_never_sy(Agent&);
+
 	// Increasing time
 	void advance_in_time() { time += dt; }
 
@@ -323,7 +342,6 @@ private:
 	 * \brief Assign agents to households, schools, and workplaces
 	 */
 	void register_agents();
-
 };
 
 // Write Place objects

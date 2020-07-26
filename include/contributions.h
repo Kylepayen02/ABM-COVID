@@ -73,15 +73,6 @@ public:
 
 private:
 
-	//
-	// Specific contribution types
-	//
-	
-	/// \brief Count contributions of a untreated and not tested symptomatic agent
-	void compute_regular_symptomatic_contributions(const Agent& agent,  
-				const double inf_var, std::vector<Household>& households, 
-				std::vector<School>& schools, std::vector<Workplace>& workplaces);
-
 };
 #endif
 

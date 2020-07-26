@@ -36,10 +36,9 @@ public:
   	 * @param alpha_exp - household size correction
   	 * @param severity_cor - severity correction for symptomatic
   	 * @param beta - infection transmission rate, 1/time
-	 * @param betaih - infection transmission rate for home isolated, 1/time
   	 */
-	Household(int house_ID, double xi, double yi, const double alpha_exp, const double severity_cor, const double beta, const double betaih) : 
-		alpha(alpha_exp), beta_ih(betaih), Place(house_ID, xi, yi, severity_cor, beta) { } 
+	Household(int house_ID, double xi, double yi, const double alpha_exp, const double severity_cor, const double beta) :
+		alpha(alpha_exp), Place(house_ID, xi, yi, severity_cor, beta) { }
 
 	//
  	// I/O

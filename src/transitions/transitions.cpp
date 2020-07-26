@@ -34,14 +34,9 @@ int Transitions::exposed_transitions(Agent& agent, Infection& infection, const d
 										std::vector<Workplace>& workplaces,
 										const std::map<std::string, double>& infection_parameters)
 {
-	bool recovered_reg = false;
-	int agent_recovered = 0;
 
-    agent_recovered = regular_tr.exposed_transitions(agent, infection, time, dt,
+    int agent_recovered = regular_tr.exposed_transitions(agent, infection, time, dt,
                 households, schools, workplaces, infection_parameters);
-    recovered_reg = static_cast<bool>(agent_recovered);
-
-	agent_recovered = static_cast<int>(recovered_reg);
 
 	return agent_recovered;
 }
