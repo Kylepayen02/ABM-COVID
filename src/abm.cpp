@@ -201,8 +201,8 @@ void ABM::register_agents()
 
         // register in the household
         // Assign agent to random household
-        house_ID = infection.get_random_household_ID(households.size());
-        agent.set_household_ID(house_ID);
+
+        house_ID = agent.get_household_ID();
         Household& house = households.at(house_ID - 1);
         house.register_agent(agent_ID, infected);
 
