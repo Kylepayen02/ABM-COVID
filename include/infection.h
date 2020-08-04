@@ -60,6 +60,8 @@ public:
 	/// \brief Returns random house ID  
 	/// @param n_hs - total number of households 
 	int get_random_household_ID(const int n_hs);
+    /// \brief Returns random agent ID
+    int get_random_agent_ID(const int n_ag);
 
 	//
 	// Setters

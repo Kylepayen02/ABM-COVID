@@ -131,22 +131,31 @@ void ABM::create_workplaces(const std::string fname)
 
 
 // Create agents and assign them to appropriate places
-void ABM::create_agents(const std::string fname)
+void ABM::create_agents(const std::string fname, const int ninf0)
 {
-	load_agents(fname);
-	register_agents();
+    load_agents(fname, ninf0);
+    register_agents();
 }
 
 // Retrieve agent information from a file
-void ABM::load_agents(const std::string fname)
+void ABM::load_agents(const std::string fname, const int ninf0)
 {
 	// Read the whole file
 	std::vector<std::vector<std::string>> file = read_object(fname);
 
+    // For custom generation of initially infected
+    std::vector<int> infected_IDs(ninf0);
+    if (ninf0 != 0){
+        int nIDs = file.size();
+        // Random choice of IDs
+        for (int i=0; i<ninf0; ++i){
+            infected_IDs.at(i) = infection.get_random_agent_ID(nIDs);
+        }
+    }
 
 	// Counter for agent IDs
 	int agent_ID = 1;
-	
+
 	// One agent per line, with properties as defined in the line
 	for (auto agent : file){
 		// Agent status
@@ -161,26 +170,35 @@ void ABM::load_agents(const std::string fname)
 			student = true;
 		// Check if agents works
 		if (std::stoi(agent.at(1)) == 1)
-			works = true; 
-			
-		// Check if infected
-		bool infected = false;
-		if (std::stoi(agent.at(11)) == 1){
-			infected = true;
-			n_infected_tot++;
-		}
+			works = true;
 
-		Agent temp_agent(student, works, std::stoi(agent.at(2)), 
+		// Random or from the input file
+		bool infected = false;
+        if (ninf0 != 0){
+            auto iter = std::find(infected_IDs.begin(), infected_IDs.end(), agent_ID);
+            if (iter != infected_IDs.end()){
+                infected_IDs.erase(iter);
+                infected = true;
+                n_infected_tot++;
+            }
+        } else {
+            if (std::stoi(agent.at(14)) == 1){
+                infected = true;
+                n_infected_tot++;
+            }
+        }
+
+		Agent temp_agent(student, works, std::stoi(agent.at(2)),
 			std::stod(agent.at(3)), std::stod(agent.at(4)), house_ID,
 			std::stoi(agent.at(7)), std::stoi(agent.at(8)), infected);
 
 		// Set Agent ID
 		temp_agent.set_ID(agent_ID++);
-		
+
 		// Set properties for exposed if initially infected
 		if (temp_agent.infected() == true)
-			initial_exposed(temp_agent);	
-		
+			initial_exposed(temp_agent);
+
 		// Store
 		agents.push_back(temp_agent);
 	}
@@ -365,6 +383,14 @@ void ABM::compute_state_transitions()
 //
 // Getters
 //
+int ABM::get_num_susceptible() const {
+    int susceptible_count = 0;
+    for (const auto& agent : agents){
+        if (!agent.infected() && !agent.exposed() && !agent.get_dead() && !agent.get_recovered())
+            ++susceptible_count;
+    }
+    return susceptible_count;
+}
 
 /// Retrieve number of infected agents at this time step
 int ABM::get_num_infected() const
@@ -386,6 +412,16 @@ int ABM::get_num_exposed() const
 			++exposed_count;
 	}
 	return exposed_count;
+}
+
+int ABM::get_num_removed() const
+{
+    int removed_count = 0;
+    for (const auto& agent : agents){
+        if (agent.removed())
+            ++removed_count;
+    }
+    return removed_count;
 }
 
 //
@@ -528,4 +564,6 @@ void ABM::output_dead_interactions(std::string filename) {
         out << '\n';
     }
 }
+
+
 

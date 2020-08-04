@@ -92,18 +92,20 @@ public:
 	void create_workplaces(const std::string filename);
 
 	/**
-	 * \brief Create agents based on information in a file
-	 * \details Constructs agents from demographic information
-	 * 		in a file with agent per row, columns being the
-	 *		information as it currently appears in the Agent
-	 *		constructor; assigns agents to households, schools, and
-	 *		workplaces - needs to be called AFTER creating
-	 *		those places;
-	 *	
-	 * @param filename - path of the file with input information
-	 * 
-	 */	
-	void create_agents(const std::string filename);
+     * \brief Create agents based on information in a file
+     * \details Constructs agents from demographic information
+     * 		in a file with agent per row, columns being the
+     *		information as it currently appears in the Agent
+     *		constructor; assigns agents to households, schools,
+     *		workplaces, and hospitals - needs to be called AFTER creating
+     *		those places; Optionally it can randomly choose initially
+     *		infected as specified by the input parameter;
+     *
+     * @param filename - path of the file with input information
+     * @param ninf0 - number of initially infected - overwriting input file
+     *
+     */
+    void create_agents(const std::string filename, const int ninf0 = 0);
 
 	//
 	// Transmission of infection
@@ -123,12 +125,15 @@ public:
 	//
 	// Getters
 	//
-	
+
+	int get_num_susceptible() const;
 	/// Retrieve number of infected agents at this time step
 	int get_num_infected() const;
 
 	/// Retrieve number of exposed
 	int get_num_exposed() const;
+
+	int get_num_removed() const;
 
 	/// Retrieve number of total infected
 	int get_total_infected() const { return n_infected_tot; }
@@ -333,10 +338,11 @@ private:
 	template <typename T>
 	void print_agents_in_places(std::vector<T> places, const std::string fname) const;
 
-	/**
-	 * \brief Retrieve information about agents from a file and store all in a vector
-	 */
-	void load_agents(const std::string fname);
+    /**
+     * \brief Retrieve information about agents from a file and store all in a vector
+     * \details Optional parameter overwrites the loaded initially infected with custom
+     */
+    void load_agents(const std::string fname, const int ninf0 = 0);
 
 	/**
 	 * \brief Assign agents to households, schools, and workplaces

@@ -76,6 +76,13 @@ int Infection::get_random_household_ID(int n_hs)
 	return rng.get_random_int(1, n_hs);
 }
 
+// Returns random household ID for testing
+int Infection::get_random_agent_ID(const int n_ag)
+{
+    return rng.get_random_int(1, n_ag);
+}
+
+
 //
 // Setters
 //

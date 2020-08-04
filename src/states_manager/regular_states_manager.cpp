@@ -73,7 +73,7 @@ void RegularStatesManager::set_any_to_removed(Agent& agent)
 {
     if (agent.dying())
         agent.set_dead(true);
-    else if (agent.recovering())
+    else
         agent.set_recovered(true);
 
     agent.set_removed(true);
