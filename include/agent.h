@@ -35,14 +35,15 @@ public:
  	 * @param yi - y coordinate of the Agent
  	 * @param houseID - household ID
  	 * @param schoolID - ID of the school Agent attends
+ 	 * @param wrkSch - true if agent works at a school
  	 * @param workID - ID of the workplace Agent works at
  	 * @param infected - true if Agent is infected
  	 */	
 	Agent(const bool student, const bool works, const int yrs, const double xi, 
-			const double yi, const int houseID, const int schoolID,
+			const double yi, const int houseID, const int schoolID, const bool wrkSch,
 			const int workID, const bool infected)
 			: is_student(student), is_working(works), age(yrs),
-		   		x(xi), y(yi), house_ID(houseID), school_ID(schoolID),
+		   		x(xi), y(yi), house_ID(houseID), school_ID(schoolID), worksSch(wrkSch),
 				work_ID(workID), is_infected(infected) { }
 
 	//
@@ -74,6 +75,8 @@ public:
 	bool student() const { return is_student; }
 	/// True if agent works
 	bool works() const { return is_working; }
+	///True if agent works at school
+	bool school_employee() const { return worksSch; }
 
 	/// State getters
 	bool exposed() const { return is_exposed; }
@@ -208,6 +211,7 @@ private:
 	int school_ID = -1;
 	int work_ID = -1;
 	int agent_school_type = -1;
+	bool worksSch = false;
 
 	// Infection status
 	bool is_infected = false;

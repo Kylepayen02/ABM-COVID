@@ -39,17 +39,17 @@ int main()
 	abm.create_workplaces(wfile);
 
 	// Then the agents
-	abm.create_agents(fin, 100);
+	abm.create_agents(fin, 10);
 	
 	// Simulation
 	// Collect infected agents and save
 	std::vector<int> infected_count(tmax+1);
 	// Add exposed too
-//	std::vector<int> exposed_count(tmax+1);
+	std::vector<int> exposed_count(tmax+1);
     // Add exposed too
-//    std::vector<int> susceptible_count(tmax+1);
+    std::vector<int> susceptible_count(tmax+1);
     // Add removed too
-//    std::vector<int> removed_count(tmax+1);
+    std::vector<int> removed_count(tmax+1);
 
 	// For time measurement
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -62,42 +62,42 @@ int main()
 		}*/
 
         //Get the number of interactions for each agent
-        if (ti == 0){
-            abm.collect_all_interactions();
-        }
+//        if (ti == 0){
+//            abm.collect_all_interactions();
+//        }
 
 		infected_count.at(ti) = abm.get_num_infected();
-//        exposed_count.at(ti) = abm.get_num_exposed();
-//        susceptible_count.at(ti) = abm.get_num_susceptible();
-//        removed_count.at(ti) = abm.get_num_removed();
+        exposed_count.at(ti) = abm.get_num_exposed();
+        susceptible_count.at(ti) = abm.get_num_susceptible();
+        removed_count.at(ti) = abm.get_num_removed();
 
 		abm.transmit_infection();
-		abm.collect_dead_interactions();
+//		abm.collect_dead_interactions();
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-//	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
-//	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::seconds> (end - begin).count() << "[s]" << std::endl;
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::seconds> (end - begin).count() << "[s]" << std::endl;
 
 	// Output infected
-//	std::ofstream out("output/infected_with_time.txt");
-//	std::copy(infected_count.begin(), infected_count.end(), std::ostream_iterator<int>(out," "));
+	std::ofstream out("output/infected_with_time.txt");
+	std::copy(infected_count.begin(), infected_count.end(), std::ostream_iterator<int>(out," "));
 
-//    std::ofstream outE("output/exposed_with_time.txt");
-//    std::copy(exposed_count.begin(), exposed_count.end(), std::ostream_iterator<int>(outE," "));
+    std::ofstream outE("output/exposed_with_time.txt");
+    std::copy(exposed_count.begin(), exposed_count.end(), std::ostream_iterator<int>(outE," "));
 
-//    std::ofstream outS("output/susceptible_with_time.txt");
-//    std::copy(susceptible_count.begin(), susceptible_count.end(), std::ostream_iterator<int>(outS," "));
+    std::ofstream outS("output/susceptible_with_time.txt");
+    std::copy(susceptible_count.begin(), susceptible_count.end(), std::ostream_iterator<int>(outS," "));
 
-//    std::ofstream outR("output/removed_with_time.txt");
-//    std::copy(removed_count.begin(), removed_count.end(), std::ostream_iterator<int>(outR," "));
+    std::ofstream outR("output/removed_with_time.txt");
+    std::copy(removed_count.begin(), removed_count.end(), std::ostream_iterator<int>(outR," "));
 
 
 	// Output interactions
-    abm.output_interactions("interactions.txt");
+//    abm.output_interactions("interactions.txt");
 
     //Output dead interactions
-    abm.output_dead_interactions("dead_interactions.txt");
+//    abm.output_dead_interactions("dead_interactions.txt");
 
 	// Print total values
 	std::cout << "Total number of infected agents: " << abm.get_total_infected() << "\n"

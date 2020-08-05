@@ -15,7 +15,7 @@
 void School::print_basic(std::ostream& where) const
 {
 	Place::print_basic(where);
-	where << " " << psi_j;	
+	where << " " << beta_emp << " " << psi_emp << " " << psi_j;
 }
 
 

@@ -99,10 +99,12 @@ void ABM::create_schools(const std::string fname)
 		else
 			throw std::invalid_argument("Wrong school type: " + school_type);
 
-		School temp_school(std::stoi(school.at(0)), 
-			std::stod(school.at(1)), std::stod(school.at(2)),
-			infection_parameters.at("severity correction"),	psi,
-			infection_parameters.at("school transmission rate"));
+        School temp_school(std::stoi(school.at(0)),
+                           std::stod(school.at(1)), std::stod(school.at(2)),
+                           infection_parameters.at("severity correction"),
+                           infection_parameters.at("school employee absenteeism correction"), psi,
+                           infection_parameters.at("school employee transmission rate"),
+                           infection_parameters.at("school transmission rate"));
 
 		// Store 
 		schools.push_back(temp_school);
@@ -159,7 +161,7 @@ void ABM::load_agents(const std::string fname, const int ninf0)
 	// One agent per line, with properties as defined in the line
 	for (auto agent : file){
 		// Agent status
-		bool student = false, works = false;
+		bool student = false, works = false, worksSch = false;
 		int house_ID = -1;
 
 
@@ -188,9 +190,12 @@ void ABM::load_agents(const std::string fname, const int ninf0)
             }
         }
 
+        if (std::stoi(agent.at(10)) == 1)
+            worksSch = true;
+
 		Agent temp_agent(student, works, std::stoi(agent.at(2)),
 			std::stod(agent.at(3)), std::stod(agent.at(4)), house_ID,
-			std::stoi(agent.at(7)), std::stoi(agent.at(8)), infected);
+			std::stoi(agent.at(7)), worksSch, std::stoi(agent.at(11)), infected);
 
 		// Set Agent ID
 		temp_agent.set_ID(agent_ID++);
@@ -220,7 +225,9 @@ void ABM::register_agents()
         // register in the household
         // Assign agent to random household
 
-        house_ID = agent.get_household_ID();
+        house_ID = infection.get_random_household_ID(households.size());
+        agent.set_household_ID(house_ID);
+//        house_ID = agent.get_household_ID();
         Household& house = households.at(house_ID - 1);
         house.register_agent(agent_ID, infected);
 
@@ -234,12 +241,19 @@ void ABM::register_agents()
 
 		if (agent.works()){
 			work_ID = agent.get_work_ID();
-			Workplace& work = workplaces.at(work_ID - 1);
-			work.register_agent(agent_ID, infected);		
+//			Workplace& work = workplaces.at(work_ID - 1);
+//			work.register_agent(agent_ID, infected);
+            if (agent.school_employee()){
+                School& school = schools.at(work_ID - 1);
+                school.register_agent(agent_ID, infected);
+            }else{
+                Workplace& work = workplaces.at(work_ID - 1);
+                work.register_agent(agent_ID, infected);
+            }
 		}
-
 	} 
 }
+
 // Might use, might not
 // Initial set-up of exposed agents
 //void ABM::initial_exposed_with_never_sy(Agent& agent)

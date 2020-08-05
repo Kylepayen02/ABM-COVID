@@ -33,8 +33,13 @@ void Contributions::compute_exposed_contributions(const Agent& agent, const doub
         school.add_exposed(inf_var);
     }
     if (agent.works() == true){
-        Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
-        workplace.add_exposed(inf_var);
+        if (agent.school_employee()){
+            School& sch = schools.at(agent.get_work_ID()-1);
+            sch.add_exposed_employee(inf_var);
+        } else {
+            Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
+            workplace.add_exposed(inf_var);
+        }
     }
 }
 
@@ -57,8 +62,13 @@ void Contributions::compute_symptomatic_contributions(const Agent& agent, const 
         school.add_symptomatic(inf_var);
     }
     if (agent.works() == true){
-        Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
-        workplace.add_symptomatic(inf_var);
+        if (agent.school_employee()){
+            School& sch = schools.at(agent.get_work_ID()-1);
+            sch.add_exposed_employee(inf_var);
+        } else {
+            Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
+            workplace.add_exposed(inf_var);
+        }
     }
 }
 

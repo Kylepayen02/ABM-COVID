@@ -40,18 +40,31 @@ double RegularTransitions::compute_susceptible_lambda(const Agent& agent, const 
 	const Household& house = households.at(agent.get_household_ID()-1);
 	if (agent.student() && agent.works()){
 		const School& school = schools.at(agent.get_school_ID()-1);
-		const Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
-		lambda_tot = house.get_infected_contribution()+ 
-						workplace.get_infected_contribution()+
-						school.get_infected_contribution();
+        if (agent.school_employee()){
+            const School& workSch = schools.at(agent.get_work_ID()-1);
+            lambda_tot = house.get_infected_contribution()+
+                         workSch.get_infected_contribution()+
+                         school.get_infected_contribution();
+        } else {
+            const Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
+            lambda_tot = house.get_infected_contribution()+
+                         workplace.get_infected_contribution()+
+                         school.get_infected_contribution();
+        }
 	} else if (agent.student()){
 		const School& school = schools.at(agent.get_school_ID()-1);
 		lambda_tot = house.get_infected_contribution()+ 
 						school.get_infected_contribution();
 	} else if (agent.works()){
-		const Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
-		lambda_tot = house.get_infected_contribution()+ 
-						workplace.get_infected_contribution();
+        if (agent.school_employee()){
+            const School& school = schools.at(agent.get_work_ID()-1);
+            lambda_tot = house.get_infected_contribution()+
+                         school.get_infected_contribution();
+        } else {
+            const Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
+            lambda_tot = house.get_infected_contribution()+
+                         workplace.get_infected_contribution();
+        }
 	} else {
 		lambda_tot = house.get_infected_contribution();
 	}	
@@ -203,10 +216,16 @@ void RegularTransitions::remove_agent_from_all_places(const Agent& agent,
 	} else {
 		throw std::runtime_error("Regular symptomatic agent does not have a valid household ID");
 	}
-	if (agent.student())
+	if (agent.student()){
 		schools.at(agent.get_school_ID()-1).remove_agent(agent_ID);
-	if (agent.works())
-		workplaces.at(agent.get_work_ID()-1).remove_agent(agent_ID);
+	}
+	if (agent.works()){
+        if (agent.school_employee()){
+            schools.at(agent.get_work_ID()-1).remove_agent(agent_ID);
+        } else {
+            workplaces.at(agent.get_work_ID()-1).remove_agent(agent_ID);
+        }
+    }
 }
 
 // Add to all from places where they are registered
@@ -216,8 +235,13 @@ void RegularTransitions::add_to_all_workplaces_and_schools(const Agent& agent,
 	int agent_ID = agent.get_ID();
 	if (agent.student())
 		schools.at(agent.get_school_ID()-1).add_agent(agent_ID);
-	if (agent.works())
-		workplaces.at(agent.get_work_ID()-1).add_agent(agent_ID);
+	if (agent.works()){
+        if (agent.school_employee()){
+            schools.at(agent.get_work_ID()-1).add_agent(agent_ID);
+        } else {
+            workplaces.at(agent.get_work_ID()-1).add_agent(agent_ID);
+        }
+	}
 }
 
 // Remove agent's index from all workplaces and schools that have them registered
@@ -227,8 +251,13 @@ void RegularTransitions::remove_from_all_workplaces_and_schools(const Agent& age
 	int agent_ID = agent.get_ID();
 	if (agent.student())
 		schools.at(agent.get_school_ID()-1).remove_agent(agent_ID);
-	if (agent.works())
-		workplaces.at(agent.get_work_ID()-1).remove_agent(agent_ID);
+	if (agent.works()){
+        if (agent.school_employee()){
+            schools.at(agent.get_work_ID()-1).remove_agent(agent_ID);
+        } else {
+            workplaces.at(agent.get_work_ID()-1).remove_agent(agent_ID);
+        }
+    }
 }
 
 // Add agent's ID back to the places where they are registered
@@ -240,10 +269,16 @@ void RegularTransitions::add_agent_to_all_places(const Agent& agent,
 {
 	int agent_ID = agent.get_ID();
 		
-	if (agent.student())
+	if (agent.student()){
 		schools.at(agent.get_school_ID()-1).add_agent(agent_ID);
-	if (agent.works())
-		workplaces.at(agent.get_work_ID()-1).add_agent(agent_ID);
+    }
+	if (agent.works()){
+        if (agent.school_employee()){
+            schools.at(agent.get_work_ID()-1).add_agent(agent_ID);
+        } else {
+            workplaces.at(agent.get_work_ID()-1).add_agent(agent_ID);
+        }
+    }
 }
 
 
