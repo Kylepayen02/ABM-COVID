@@ -184,18 +184,18 @@ void ABM::load_agents(const std::string fname, const int ninf0)
                 n_infected_tot++;
             }
         } else {
-            if (std::stoi(agent.at(14)) == 1){
+            if (std::stoi(agent.at(9)) == 1){
                 infected = true;
                 n_infected_tot++;
             }
         }
 
-        if (std::stoi(agent.at(10)) == 1)
+        if (std::stoi(agent.at(7)) == 1)
             worksSch = true;
 
 		Agent temp_agent(student, works, std::stoi(agent.at(2)),
 			std::stod(agent.at(3)), std::stod(agent.at(4)), house_ID,
-			std::stoi(agent.at(7)), worksSch, std::stoi(agent.at(11)), infected);
+			std::stoi(agent.at(6)), worksSch, std::stoi(agent.at(8)), infected);
 
 		// Set Agent ID
 		temp_agent.set_ID(agent_ID++);
@@ -225,9 +225,9 @@ void ABM::register_agents()
         // register in the household
         // Assign agent to random household
 
-        house_ID = infection.get_random_household_ID(households.size());
-        agent.set_household_ID(house_ID);
-//        house_ID = agent.get_household_ID();
+//        house_ID = infection.get_random_household_ID(households.size());
+//        agent.set_household_ID(house_ID);
+        house_ID = agent.get_household_ID();
         Household& house = households.at(house_ID - 1);
         house.register_agent(agent_ID, infected);
 

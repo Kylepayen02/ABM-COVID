@@ -62,3 +62,12 @@ exe_name = 'trans_inf_test'
 spec_files = 'infection_transmission.cpp '
 compile_com = ' '.join([cx, std, opt, '-o', exe_name, spec_files, tst_files, src_files])
 subprocess.call([compile_com], shell=True)
+
+#Test 3
+#Collection of agent contacts
+#Name of the executable
+exe_name = "contact_test"
+#Files needed only for this build
+spec_files = "contacts_test.cpp"
+compile_com = ' '.join([cx, std, opt, '-o', exe_name, spec_files, tst_files, src_files])
+subprocess.call([compile_com], shell=True)

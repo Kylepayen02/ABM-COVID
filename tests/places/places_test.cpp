@@ -12,10 +12,8 @@ bool place_test();
 bool school_test();
 bool workplace_test();
 bool household_test();
-bool hospital_test();
 
 // Tests for contributions
-bool contribution_test_hospitals();
 bool contribution_test_general_place();
 bool contribution_test_workplace();
 bool contribution_test_school();

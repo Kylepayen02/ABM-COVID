@@ -59,9 +59,19 @@ std::vector<int> Agent::collect_interactions(const std::vector<Agent>& agents){
                     stats.at(1) += 1;
                 }
             }
-        } else {
+        } else if (!student()){
             if (house_ID == agent.get_household_ID()
                 || work_ID == agent.get_work_ID()){
+                if (!agent.get_dead()){
+                    stats.at(0) += 1;
+                }else{
+                    stats.at(1) += 1;
+                }
+            }
+        } else {
+            if (house_ID == agent.get_household_ID()
+                || work_ID == agent.get_work_ID()
+                || school_ID == agent.get_school_ID()){
                 if (!agent.get_dead()){
                     stats.at(0) += 1;
                 }else{
