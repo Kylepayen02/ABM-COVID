@@ -1,5 +1,4 @@
 *.fig
-*.txt
 __pycache__
 *.tex
 *.pdf
