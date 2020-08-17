@@ -25,6 +25,10 @@ public:
 	 */
 	Agent() = default;
 
+	// Better keep flags and IDs clustered i.e. have worksSch 
+	// right after works - I think I didn't do it this way
+	// now either though ;)
+
 	/**
  	 * \brief Creates an Agent object with custom attributes
  	 *
@@ -88,6 +92,9 @@ public:
 	bool recovering() const { return will_recover; }
 	bool removed() const { return is_removed; }
 
+	// I would call these dead() and recovered()
+	// and the variables is_dead and is_recovered
+	// I would keep the "set_" for setting though
 	bool get_dead() const { return dead; }
 	bool get_recovered() const { return recovered; }
 

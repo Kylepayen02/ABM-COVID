@@ -2,6 +2,10 @@
 0.49
 // severity correction
 2.0
+// school employee absenteeism correction
+0.1
+// school employee transmission rate
+0.66
 // household scaling parameter
 0.8
 // workplace transmission rate

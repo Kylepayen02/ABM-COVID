@@ -12,7 +12,7 @@ void test_contacts();
 //bool compare_files();
 
 int main(){
-    //
+    // Very nice test!
     test_contacts();
 }
 
@@ -52,7 +52,7 @@ void test_contacts()
     abm.create_workplaces(wfile);
 
     // Then the agents
-    abm.create_agents(fin, 0);
+    abm.create_agents(fin);
 
     std::vector<Agent>& agents = abm.get_vector_of_agents_non_const();
 
@@ -69,20 +69,15 @@ void test_contacts()
             agents.at(9).set_dead(true);
         }
 
-
         abm.collect_all_interactions();
         abm.collect_dead_interactions();
     }
-
-
 
     // Output interactions
     abm.output_interactions("interactions.txt");
 
     //Output dead interactions
     abm.output_dead_interactions("dead_interactions.txt");
-
-
 }
 
 

@@ -74,7 +74,7 @@ bool create_households_test()
 	
 	// Vector of infection parameters 
 	// (order as in output file: ck, beta, alpha)
-	std::vector<double> infection_parameters = {2.0, 0.49, 0.80, 0.4}; 
+	std::vector<double> infection_parameters = {2.0, 0.49, 0.80}; 
 
 	// Check if correct, hardcoded for places properties
 	return compare_places_files(fin, fout, infection_parameters);
@@ -97,20 +97,20 @@ bool create_schools_test()
 	std::string dmort_name("test_data/age_dist_mortality.txt");
 	// Map for abm loading of distrinutions
 	std::map<std::string, std::string> dfiles = 
-		{{"mortality", dmort_name} };
+		{{"mortality", dmort_name}};
 
 	ABM abm(dt, pfname, dfiles);
 	abm.create_schools(fin);
 	abm.print_schools(fout);
 
-	bool has_type = true;
+	bool is_school = true;
 
 	// Vector of infection parameters 
 	// (order as in output file: ck, beta, psi for middle)
-	std::vector<double> infection_parameters = {2.0, 0.94, 0.2}; 
+	std::vector<double> infection_parameters = {2.0, 0.94, 0.66, 0.1, 0.2}; 
 
 	// Check if correct, hardcoded for places properties
-	return compare_places_files(fin, fout, infection_parameters, has_type);
+	return compare_places_files(fin, fout, infection_parameters, is_school);
 }
 
 // Tests if exception is triggered upon entering a wrong school type
@@ -217,18 +217,18 @@ bool create_agents_test()
 	// Check if correctly registered in every type of place
 	// Vectors with expected number of agents nd infected
 	// agents in each place (first entry total, second - total infected)
-	std::vector<std::vector<int>> houses = {{3, 1}, {1, 0}, {1, 0}};
-	std::vector<std::vector<int>> schools = {{2, 1}, {0, 0}, {1, 0}, {0, 0}};
+	std::vector<std::vector<int>> houses = {{4, 2}, {1, 0}, {1, 1}};
+	std::vector<std::vector<int>> schools = {{2, 1}, {0, 0}, {2, 2}, {0, 0}};
 	std::vector<std::vector<int>> workplaces = {{0, 0}, {1, 0}};
 
 	// Expected agents in each place by ID
-	std::vector<std::vector<int>> houses_agents = {{4, 5, 6}, {2}, {3}};
-	std::vector<std::vector<int>> schools_agents = {{4, 5}, {0}, {3}, {0}};
+	std::vector<std::vector<int>> houses_agents = {{1, 4, 5, 6}, {2}, {3}};
+	std::vector<std::vector<int>> schools_agents = {{4, 5}, {0}, {3,5}, {0}};
 	std::vector<std::vector<int>> workplaces_agents = {{0}, {2}};
 
-	if (!correctly_registered(abm, houses, houses_agents, "House", hinfo, hagnt, 4))
+	if (!correctly_registered(abm, houses, houses_agents, "House", hinfo, hagnt, 3))
 		return false;
-	if (!correctly_registered(abm, schools, schools_agents, "school", sinfo, sagnt, 3))
+	if (!correctly_registered(abm, schools, schools_agents, "school", sinfo, sagnt, 5))
 		return false;
 	if (!correctly_registered(abm, workplaces, workplaces_agents, "Workplace", winfo, wagnt, 3))
 		return false;
@@ -268,7 +268,7 @@ bool create_infection_model_test(const std::string outfile_1, const std::string 
 
 /// \brief Compare input places file with output from a Place object 
 bool compare_places_files(std::string fname_in, std::string fname_out, 
-				const std::vector<double> infection_parameters, const bool has_type)
+				const std::vector<double> infection_parameters, const bool is_school)
 {
 	std::ifstream input(fname_in);
 	std::ifstream output(fname_out);
@@ -276,11 +276,12 @@ bool compare_places_files(std::string fname_in, std::string fname_out,
 	// Load the first file as vectors
 	std::vector<int> in_IDs;
 	std::vector<double> in_coords_x, in_coords_y;
+	std::vector<std::string> school_types;
 
 	int ID = 0;
 	double x = 0.0, y = 0.0;
-	std::string type = {};
-	if (has_type == false){
+	std::string school_type = {};
+	if (is_school == false){
 		while (input >> ID >> x >> y){
 			in_IDs.push_back(ID);
 			in_coords_x.push_back(x);
@@ -288,10 +289,11 @@ bool compare_places_files(std::string fname_in, std::string fname_out,
 		}
 	}else{
 		// For places that have types
-		while (input >> ID >> x >> y >> type){
+		while (input >> ID >> x >> y >> school_type){
 			in_IDs.push_back(ID);
 			in_coords_x.push_back(x);
 			in_coords_y.push_back(y);
+			school_types.push_back(school_type);
 		}
 	}
 
@@ -346,36 +348,40 @@ bool compare_agents_files(std::string fname_in, std::string fname_out)
 	// house ID, school ID, work ID,
 	std::vector<std::vector<int>> places;		 
 	
-	int ID = 0, yrs = 0, hID = 0, sID = 0, wID = 0, hspID = 0;
+	int ID = 0, yrs = 0, hID = 0, sID = 0, wID = 0;
 	bool studies = false, works = false, is_infected = false;
+	bool worksSch = false;
 	double x = 0.0, y = 0.0;
 
 	while (input >> studies >> works >> yrs 
-			>> x >> y >> hID >> sID >> wID >> is_infected)
+			>> x >> y >> hID >> sID >> worksSch >> wID >> is_infected)
 	{
 		IDs.push_back(++ID);
-		status.push_back({studies, works});
+		status.push_back({studies, works, worksSch});
 		infected.push_back(is_infected);
 		age.push_back(yrs);
 		position.push_back({x, y});
-		places.push_back({hID, sID, wID, hspID});
+		places.push_back({hID, sID, wID});
 	}
 
 	// Now load the second (output) file and compare
 	int ind = 0;
 	while (output >> ID >> studies >> works >> yrs 
-			>> x >> y >> hID >> sID >> wID
+			>> x >> y >> hID >> sID >> worksSch >> wID
 			>> is_infected)
 	{
 		if (ID != IDs.at(ind))
 			return false;
 		if (studies != status.at(ind).at(0) 
-				|| works != status.at(ind).at(1))
+				|| works != status.at(ind).at(1)
+				|| worksSch != status.at(ind).at(2))
 			return false;
 		if (is_infected != infected.at(ind))
 			return false;
-		if (yrs != age.at(ind))
+		if (yrs != age.at(ind)){
+			std::cout << yrs << " " << age.at(ind) << "\n";
 			return false;
+		}
 		if (!float_equality<double>(x, position.at(ind).at(0), 1e-5))
 			return false;
 		if (!float_equality<double>(y, position.at(ind).at(1), 1e-5))
@@ -435,10 +441,14 @@ bool correctly_registered(const ABM abm, const std::vector<std::vector<int>> pla
 		for (int i=0; i<num_red_args; ++i)
 			info_total >> not_needed_arg;
 
-		if (num_agents != place_info.at(ind).at(0))
+		if (num_agents != place_info.at(ind).at(0)){
+			std::cout << "Wrong total number of agents\n"; 
 			return false;
-		if (num_inf != place_info.at(ind).at(1))
+		}
+		if (num_inf != place_info.at(ind).at(1)){
+			std::cout << "Wrong number of infected agents\n";
 			return false;		
+		}
 		++ind;
 	}
 

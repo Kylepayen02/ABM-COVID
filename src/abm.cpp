@@ -164,7 +164,6 @@ void ABM::load_agents(const std::string fname, const int ninf0)
 		bool student = false, works = false, worksSch = false;
 		int house_ID = -1;
 
-
 		house_ID = std::stoi(agent.at(5));
 
 		// Check if agent is a student
@@ -222,15 +221,11 @@ void ABM::register_agents()
 		agent_ID = agent.get_ID();
 		infected = agent.infected();
 
-        // register in the household
+        // Register in the household
         // Assign agent to random household
-
-//        house_ID = infection.get_random_household_ID(households.size());
-//        agent.set_household_ID(house_ID);
         house_ID = agent.get_household_ID();
-        Household& house = households.at(house_ID - 1);
+		Household& house = households.at(house_ID - 1);
         house.register_agent(agent_ID, infected);
-
 
 		// Register in schools and workplaces
 		if (agent.student()){
@@ -241,8 +236,6 @@ void ABM::register_agents()
 
 		if (agent.works()){
 			work_ID = agent.get_work_ID();
-//			Workplace& work = workplaces.at(work_ID - 1);
-//			work.register_agent(agent_ID, infected);
             if (agent.school_employee()){
                 School& school = schools.at(work_ID - 1);
                 school.register_agent(agent_ID, infected);
@@ -253,33 +246,6 @@ void ABM::register_agents()
 		}
 	} 
 }
-
-// Might use, might not
-// Initial set-up of exposed agents
-//void ABM::initial_exposed_with_never_sy(Agent& agent)
-//{
-//	bool never_sy = infection.recovering_exposed();
-//	// Total latency period
-//	double latency = infection.latency();
-//	// Portion of latency when the agent is not infectious
-//	double dt_ninf = std::min(infection_parameters.at("time from exposed to infectiousness"), latency);
-//
-//	if (never_sy){
-//		// Set to total latency + infectiousness duration
-//		double rec_time = infection_parameters.at("recovery time");
-//		agent.set_latency_duration(latency + rec_time);
-//		agent.set_latency_end_time(time);
-//		agent.set_infectiousness_start_time(time, dt_ninf);
-//	}else{
-//		// If latency shorter, then  not infectious during the entire latency
-//		agent.set_latency_duration(latency);
-//		agent.set_latency_end_time(time);
-//		agent.set_infectiousness_start_time(time, dt_ninf);
-//	}
-//	agent.set_inf_variability_factor(infection.inf_variability());
-//	agent.set_exposed(true);
-//	agent.set_recovering_exposed(never_sy);
-//}
 
 // Initial set-up of exposed agents
 void ABM::initial_exposed(Agent& agent)
@@ -338,7 +304,6 @@ void ABM::compute_place_contributions()
 		if (agent.removed() == true){
 			continue;
 		}
-
 
 		if (agent.infected() == false){
 			continue;
@@ -541,21 +506,37 @@ void ABM::print_agents(const std::string fname) const
 	abm_io.write_vector<Agent>(agents);	
 }
 
+// Missing descriptions in all these
+// The interior of collect_ should be part of the Agent class
+// i.e. the collection should be done in the class, and ABM
+// here should just call it 
 void ABM::collect_all_interactions(){
     for (Agent& agent : agents){
-        // First index: # of interactions Second index: # of dead
-        std::vector<int> stats = agent.collect_interactions(agents);
-        std::vector<int>& interactions = agent.get_all_interactions();
-        interactions.push_back(stats.at(0));
+ 		std::vector<int>& interactions = agent.get_all_interactions();
+		// Dead agent - enter -1
+		if (agent.get_dead()){
+			interactions.push_back(-1);       
+		}else {
+			// First index: # of interactions Second index: # of dead
+			// Should be part of the agent class in it's entirety 
+        	std::vector<int> stats = agent.collect_interactions(agents);
+        	interactions.push_back(stats.at(0));
+		}
     }
 }
 
 void ABM::collect_dead_interactions() {
     for (Agent& agent : agents){
-        // First index: # of interactions Second index: # of dead
-        std::vector<int> stats = agent.collect_interactions(agents);
-        std::vector<int>& dead_interactions = agent.get_dead_interactions();
-        dead_interactions.push_back(stats.at(1));
+ 		std::vector<int>& dead_interactions = agent.get_dead_interactions();
+ 		// Dead agent - enter -1
+		if (agent.get_dead()){
+			dead_interactions.push_back(-1);       
+		}else {  
+   			// First index: # of interactions Second index: # of dead
+        	std::vector<int> stats = agent.collect_interactions(agents);
+			// Should be part of the agent class in it's entirety
+			dead_interactions.push_back(stats.at(1));
+		}
     }
 }
 

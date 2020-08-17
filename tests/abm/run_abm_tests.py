@@ -21,3 +21,7 @@ subprocess.call(['./con_test'], shell=True)
 # Test suite 2
 ut.msg('ABM interface - infection transmission test', CYAN)
 subprocess.call(['./trans_inf_test'], shell=True)
+
+# Test suite 3
+ut.msg('ABM interface - contacts collection test', CYAN)
+subprocess.call(['./contact_test'], shell=True)

@@ -15,7 +15,7 @@
 void Household::print_basic(std::ostream& where) const
 {
 	Place::print_basic(where);
-	where << " " << alpha << " " << beta_ih;	
+	where << " " << alpha;	
 }
 
 // Calculates and stores fraction of infected agents if any 

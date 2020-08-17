@@ -29,6 +29,8 @@ oth gamma shape 0.7696
 primary and middle school absenteeism correction 0.2
 probability of death in ICU 0.5
 recovery time 14
+school employee absenteeism correction 0.1
+school employee transmission rate 0.66
 school transmission rate 0.94
 severity correction 2
 time before death to ICU 2

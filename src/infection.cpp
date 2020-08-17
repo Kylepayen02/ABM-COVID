@@ -46,7 +46,6 @@ bool Infection::recovering_exposed()
 bool Infection::will_die(const int age)
 {
 	double tot_prob = 0.0;
-
 	// Probability of death 
 	for (const auto& mrt : mortality_rates){
 		if ( age >= std::get<0>(mrt.second) &&
@@ -54,8 +53,6 @@ bool Infection::will_die(const int age)
 			tot_prob = std::get<2>(mrt.second);
 		}
 	}
-	// These numbers end up negative, need to rethink
-
 	// true if going to die
 	if (rng.get_random(0.0, 1.0) <= tot_prob)
 		return true;

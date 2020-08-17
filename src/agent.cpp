@@ -15,9 +15,11 @@
 void Agent::print_basic(std::ostream& where) const
 {
 	where << ID << " " << is_student << " " << is_working  
-		  << " " << age << " " << x << " " << y << " "
+		  << " " << age << " " 
+		  << x << " " << y << " "
 		  << house_ID << " " << " " << school_ID
-		  << " " << work_ID << " " << " " << " " << is_infected;
+		  << " " <<  worksSch 
+		  << " " << work_ID << " " << is_infected;
 }
 
 //
@@ -50,7 +52,7 @@ std::vector<int> Agent::collect_interactions(const std::vector<Agent>& agents){
                     stats.at(1) += 1;
                 }
             }
-        } else if (!works()){
+        } else if (student() && !works()){
             if (house_ID == agent.get_household_ID()
                 || school_ID == agent.get_school_ID()){
                 if (!agent.get_dead()){
@@ -59,7 +61,7 @@ std::vector<int> Agent::collect_interactions(const std::vector<Agent>& agents){
                     stats.at(1) += 1;
                 }
             }
-        } else if (!student()){
+        } else if (works() && !student()){
             if (house_ID == agent.get_household_ID()
                 || work_ID == agent.get_work_ID()){
                 if (!agent.get_dead()){
@@ -68,7 +70,7 @@ std::vector<int> Agent::collect_interactions(const std::vector<Agent>& agents){
                     stats.at(1) += 1;
                 }
             }
-        } else {
+        } else if (student() && works()){
             if (house_ID == agent.get_household_ID()
                 || work_ID == agent.get_work_ID()
                 || school_ID == agent.get_school_ID()){
@@ -78,9 +80,7 @@ std::vector<int> Agent::collect_interactions(const std::vector<Agent>& agents){
                     stats.at(1) += 1;
                 }
             }
-        }
-
-    }
-//    std::cout << stats.at(0) << std::endl;
+        }     
+	}
     return stats;
 }

@@ -246,13 +246,13 @@ bool household_test()
 {
 	int pID = 176;
 	double xi = 5.95671, yi = 11.00675;
-	double severity_cor = 3.5, beta = 0.90, beta_ih = 0.4;
+	double severity_cor = 3.5, beta = 0.90;
 	double alpha = 0.7;
 
 	Household house(pID, xi, yi, alpha, severity_cor, beta);
 
 	// All other tests including the default contribution
-	if (!general_place_test(house, pID, xi, yi, severity_cor, beta, alpha, beta_ih))
+	if (!general_place_test(house, pID, xi, yi, severity_cor, beta, alpha))
 		return false;
 	return true;
 }
@@ -262,12 +262,12 @@ bool contribution_test_household()
 {
 	int pID = 176; 
 	double xi = 5.95671, yi = 11.00675;
-	double severity_cor = 3.5, beta = 0.90, beta_ih = 0.4;
+	double severity_cor = 3.5, beta = 0.90;
 	double alpha = 0.7;
 	double inf_var = 0.5;
 
 	int n_exp = 2, n_sym = 1, n_tot = 5;
-	double exp_lambda = 1.0291;
+	double exp_lambda = 0.80223;
 
 	Household house(pID, xi, yi, alpha, severity_cor, beta);
 
@@ -301,7 +301,6 @@ bool general_contribution_test(Place& place, double inf_var,
 		else if (i >= n_exp)
 			place.add_symptomatic(inf_var);	
 	}
-
 	place.compute_infected_contribution();
 
 	lambda = place.get_infected_contribution();
@@ -325,7 +324,7 @@ bool general_place_test(Place& place, const int pID,
 	int test_pID = 0, test_ntot = 0, test_ninf = 0; 
 	double test_x = 0.0, test_y = 0.0;
 	double test_ck = 0.0, test_beta = 0.0;
-	double test_alpha = 0.0, test_beta_ih = 0.0, test_psi = 0.0;
+	double test_alpha = 0.0, test_psi = 0.0;
 	double test_beta_employee = 0.0, test_beta_patient = 0.0;
 	double test_beta_testee = 0.0, test_beta_hospitalized = 0.0;
 	double test_beta_ICU = 0.0;
@@ -339,7 +338,7 @@ bool general_place_test(Place& place, const int pID,
 		res >> test_pID >> test_x >> test_y >> test_ntot >> test_ninf >> test_ck >> test_beta;
 	// If a house
 	if (alpha > 0.0)
-		res >> test_pID >> test_x >> test_y >> test_ntot >> test_ninf >> test_ck >> test_beta >> test_alpha >> test_beta_ih;
+		res >> test_pID >> test_x >> test_y >> test_ntot >> test_ninf >> test_ck >> test_beta >> test_alpha;
 	// If a workplace
 	if (psi > 0.0)
 		res >> test_pID >> test_x >> test_y >> test_ntot >> test_ninf >> test_ck >> test_beta >> test_psi;
@@ -362,8 +361,6 @@ bool general_place_test(Place& place, const int pID,
 		return false;
 	// If a house
 	if (alpha > 0.0 && !float_equality<double>(alpha, test_alpha, 1e-5))
-		return false;
-	if (beta_ih > 0.0 && !float_equality<double>(beta_ih, test_beta_ih, 1e-5))
 		return false;
 	// If a school or workplace
 	if (psi > 0.0 && !float_equality<double>(psi, test_psi, 1e-5))
@@ -449,13 +446,12 @@ bool household_contribution_test(Household& household, double inf_var,
 		else if (i >= n_exp)
 			household.add_symptomatic(inf_var);	
 	}
-
-	household.add_symptomatic_home_isolated(inf_var);
 	household.compute_infected_contribution();
-
 	lambda = household.get_infected_contribution();
-	if (!float_equality<double>(exp_lambda, lambda, 1e-3))
+	if (!float_equality<double>(exp_lambda, lambda, 1e-3)){
+		std::cout << "Wrong household lambda, expected: " << exp_lambda << ", got: " << lambda << "\n";
 		return false;
+	}
 
 	return true;
 }

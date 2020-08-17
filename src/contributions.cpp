@@ -64,10 +64,10 @@ void Contributions::compute_symptomatic_contributions(const Agent& agent, const 
     if (agent.works() == true){
         if (agent.school_employee()){
             School& sch = schools.at(agent.get_work_ID()-1);
-            sch.add_exposed_employee(inf_var);
+            sch.add_symptomatic_employee(inf_var);
         } else {
             Workplace& workplace = workplaces.at(agent.get_work_ID()-1);
-            workplace.add_exposed(inf_var);
+            workplace.add_symptomatic(inf_var);
         }
     }
 }
