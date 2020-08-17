@@ -57,11 +57,6 @@ void test_contacts()
     std::vector<Agent>& agents = abm.get_vector_of_agents_non_const();
 
     for (int ti = 0; ti<=tmax; ++ti){
-        // Save agent information
-/*		if (ti%dt_out_agents == 0){
-			std::string fname = "output/agents_t_" + std::to_string(ti) + ".txt";
-			abm.print_agents(fname);
-		}*/
 
         //Get the number of interactions for each agent
         if (ti == 2){
@@ -90,16 +85,4 @@ void test_contacts()
 
 }
 
-//bool compare_files(std::string filename1, std::string filename2){
-//    std::fstream file1;
-//    std::fstream file2;
-//
-//    file1.open(filename1);
-//    file2.open(filename2);
-//
-//    if(file1.fail()){ std::cerr<<"Error opening file !!"<<std::endl;exit(1);}
-//    if(file2.fail()){ std::cerr<<"Error opening file !!"<<std::endl;exit(1);}
-//
-//    bool found = true;
-//
-//}
+
