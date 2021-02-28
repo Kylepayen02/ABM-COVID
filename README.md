@@ -1,7 +1,9 @@
 # AMB-COVID
 ABM model of COVID-19 focused on testing
 
-This is working version of a project I worked on during my summer with the DSL lab @ NYU 
+This is working version of a project I worked on during my summer with the DSL lab @ NYU
+
+This project follows an SEIR epidemiological model
 
 The final version can be found here: https://github.com/Dynamical-Systems-Laboratory/ABM-COVID-DSL
 
